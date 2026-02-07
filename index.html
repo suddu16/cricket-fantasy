@@ -26,13 +26,7 @@
         <a class="nav-link" data-bs-toggle="tab" href="#group_1">Group 1</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#group_2">Group 2</a>
-    </li>
-    <li class="nav-item">
         <a class="nav-link" data-bs-toggle="tab" href="#group_1_players">Group 1 Players</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#group_2_players">Group 2 Players</a>
     </li>
 </ul>
 
@@ -51,53 +45,26 @@
             <select id="group_1Selector" class="form-select" onchange="loadCSV('group_1')"></select>
             <p id="group_1Message" class="mt-2"></p>
             <div id="group_1Table"></div>
-            <img src="https://raw.githubusercontent.com/suddu16/ipl-fantasy/main/ipl2025/group_1/ipl_leaderboard.png" alt="Group 1 leaderboard">
+            <img src="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/t20_wc_2026/group_1/t20_wc_2026_leaderboard.png" alt="Group 1 leaderboard">
         </div>
 
-        <div id="group_2" class="tab-pane fade">
-            <h2>Group 2</h2>
-            <select id="group_2Selector" class="form-select" onchange="loadCSV('group_2')"></select>
-            <p id="group_2Message" class="mt-2"></p>
-            <div id="group_2Table"></div>
-            <img src="https://raw.githubusercontent.com/suddu16/ipl-fantasy/main/ipl2025/group_2/ipl_leaderboard.png" alt="Group 2 leaderboard">
-        </div>
         <div id="group_1_players" class="tab-pane fade">
     <h2>Group 1 Players</h2>
     <select id="group_1PlayersSelector" onchange="loadCSV('group_1Players')">
         <option value="">Select a Player</option>
-        <option value="https://raw.githubusercontent.com/suddu16/ipl-fantasy/main/ipl2025/group_1/Mahaarajan.csv">Mahaarajan</option>
-        <option value="https://raw.githubusercontent.com/suddu16/ipl-fantasy/main/ipl2025/group_1/Naren.csv">Naren</option>
-        <option value="https://raw.githubusercontent.com/suddu16/ipl-fantasy/main/ipl2025/group_1/Niranjini.csv">Niranjini</option>
-        <option value="https://raw.githubusercontent.com/suddu16/ipl-fantasy/main/ipl2025/group_1/Priyanka.csv">Priyanka</option>
-        <option value="https://raw.githubusercontent.com/suddu16/ipl-fantasy/main/ipl2025/group_1/Raghav.csv">Raghav</option>
-        <option value="https://raw.githubusercontent.com/suddu16/ipl-fantasy/main/ipl2025/group_1/Shashaank.csv">Shashaank</option>
-        <option value="https://raw.githubusercontent.com/suddu16/ipl-fantasy/main/ipl2025/group_1/Srikumar.csv">Srikumar</option>
-        <option value="https://raw.githubusercontent.com/suddu16/ipl-fantasy/main/ipl2025/group_1/Sriram.csv">Sriram</option>
-        <option value="https://raw.githubusercontent.com/suddu16/ipl-fantasy/main/ipl2025/group_1/Sudarshan.csv">Sudarshan</option>
+        <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/t20_wc_2026/group_1/mahaarajanmg.csv">Mahaarajan</option>
+        <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/t20_wc_2026/group_1/ntkesh.csv">Naren</option>
+        <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/t20_wc_2026/group_1/neela.csv">Niranjini</option>
+        <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/t20_wc_2026/group_1/AkshayM.csv">Akshay</option>
+        <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/t20_wc_2026/group_1/ColdTaker.csv">Raghav</option>
+        <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/t20_wc_2026/group_1/shashaank.csv">Shashaank</option>
+        <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/t20_wc_2026/group_1/sk.csv">Srikumar</option>
+        <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/t20_wc_2026/group_1/Sriram.csv">Sriram</option>
+        <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/t20_wc_2026/group_1/sudarshan.csv">Sudarshan</option>
     </select>
     <p id="group_1PlayerMessage"></p>
     <div id="group_1PlayerTable"></div>
 </div>
-
-<div id="group_2_players" class="tab-pane fade">
-    <h2>Group 2 Players</h2>
-    <select id="group_2PlayersSelector" onchange="loadCSV('group_2Players')">
-        <option value="">Select a Player</option>
-        <option value="https://raw.githubusercontent.com/suddu16/ipl-fantasy/main/ipl2025/group_2/Arvindh.csv">Arvindh</option>
-        <option value="https://raw.githubusercontent.com/suddu16/ipl-fantasy/main/ipl2025/group_2/Manav.csv">Manav</option>
-        <option value="https://raw.githubusercontent.com/suddu16/ipl-fantasy/main/ipl2025/group_2/Niranjini.csv">Niranjini</option>
-        <option value="https://raw.githubusercontent.com/suddu16/ipl-fantasy/main/ipl2025/group_2/Raghav.csv">Raghav</option>
-        <option value="https://raw.githubusercontent.com/suddu16/ipl-fantasy/main/ipl2025/group_2/Sriram V.csv">Sriram V</option>
-        <option value="https://raw.githubusercontent.com/suddu16/ipl-fantasy/main/ipl2025/group_2/Sriram KM.csv">Sriram KM</option>
-        <option value="https://raw.githubusercontent.com/suddu16/ipl-fantasy/main/ipl2025/group_2/Vasan.csv">Vasan</option>
-        <option value="https://raw.githubusercontent.com/suddu16/ipl-fantasy/main/ipl2025/group_2/Vasanth.csv">Vasanth</option>
-        <option value="https://raw.githubusercontent.com/suddu16/ipl-fantasy/main/ipl2025/group_2/Mira & Arjun.csv">Mira & Arjun</option>
-        <option value="https://raw.githubusercontent.com/suddu16/ipl-fantasy/main/ipl2025/group_2/Kumar & Akash.csv">Kumar & Akash</option>
-    </select>  
-    <p id="group_2PlayerMessage"></p>
-    <div id="group_2PlayerTable"></div>
-</div>
-
 
     </div>
 </div>
