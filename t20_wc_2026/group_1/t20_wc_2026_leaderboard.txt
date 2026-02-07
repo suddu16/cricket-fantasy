@@ -1,0 +1,14 @@
+*DAY_1*
+```
+| Manager      |   Points |
+|:-------------|---------:|
+| shashaank    |      483 |
+| neela        |      294 |
+| sudarshan    |      283 |
+| sk           |      261 |
+| mahaarajanmg |      260 |
+| AkshayM      |      203 |
+| Sriram       |      192 |
+| ntkesh       |      169 |
+| ColdTaker    |      -20 |
+```
