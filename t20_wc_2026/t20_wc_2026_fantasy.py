@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[15]:
 
 
 import pandas as pd
@@ -27,7 +27,7 @@ pd.set_option('display.max_rows',None) #display all rows
 #  pip3 install tabulate
 
 
-# In[ ]:
+# In[30]:
 
 
 import sys
@@ -45,7 +45,6 @@ print(day_num)
 
 # Change for each group
 group = sys.argv[1]
-# group = 'group_1'
 print(group)
 tournament = 't20_wc_2026'
 results_file = f'./{group}/{tournament}_results_{day}.csv'
@@ -56,28 +55,28 @@ leaderboard_file = f'./{group}/{tournament}_leaderboard.txt'
 ipl_mock_auction_summary = f'./{group}/AuctionSummary.csv'
 
 
-# In[5]:
+# In[17]:
 
 
 mvp_df = pd.read_csv(f'./data/mvp_{day}.csv')
 mvp_df
 
 
-# In[9]:
+# In[18]:
 
 
 fantasy_teams_auction_df = pd.read_csv(ipl_mock_auction_summary)
 fantasy_teams_auction_df
 
 
-# In[10]:
+# In[19]:
 
 
 fantasy_mgrs = fantasy_teams_auction_df.columns
 fantasy_mgrs.to_list()
 
 
-# In[12]:
+# In[20]:
 
 
 import os
@@ -96,7 +95,7 @@ for mgr in fantasy_teams_df.columns:
 fantasy_teams_df
 
 
-# In[13]:
+# In[22]:
 
 
 from thefuzz import fuzz
@@ -123,7 +122,7 @@ for mgr in fantasy_mgrs:
             mgr_day_pts[player_name] = 0.0
             print(f'\t{player_name} not found in mvp_table... Double check the spelling of player name, closest match is {closest_match}')
             all_players_have_min_pts = False
-    mgr_df[f'{day}'] = mgr_df[mgr].map(mgr_day_pts)
+    mgr_df[f'{day}'] = mgr_df.iloc[:, 0].map(mgr_day_pts)
     mgr_df = mgr_df.reindex(sorted(mgr_df.columns, key = lambda x: int(x.split("_")[1] if '_' in x else 0)), axis=1)
     mgr_df.to_csv(mgr_file, index=False)
     print(f'*{day.upper()}*\n```\n{mgr_df.to_markdown(index=False)}\n```')
