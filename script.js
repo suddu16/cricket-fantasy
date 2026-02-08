@@ -1,14 +1,15 @@
 const folders = ["data", "group_1", "group_2"];
-const maxDays = 75;
-const mainlineBranch = `https://raw.githubusercontent.com/suddu16/ipl-fantasy/main`;
+const maxDays = 31;
+const mainlineBranch = `https://raw.githubusercontent.com/suddu16/cricket-fantasy/main`;
+const tournament = `t20_wc_2026`
 
 // Function to populate dropdowns for each tab
 function populateDropdowns() {
     folders.forEach(folder => {
         const select = document.getElementById(`${folder}Selector`);
         if (folder === 'data') {
-            for (let i = 70; i <= maxDays; i++) { 
-                const filename = `${mainlineBranch}/ipl2025/data/mvp_day_${i}.csv`;
+            for (let i = 1; i <= maxDays; i++) { 
+                const filename = `${mainlineBranch}/${tournament}/data/mvp_day_${i}.csv`;
 
                 const option = document.createElement("option");
                 option.value = filename;
@@ -16,14 +17,14 @@ function populateDropdowns() {
                 select.appendChild(option);
             }
         } else {
-            for (let day = 70; day <= maxDays; day++) {
+            for (let day = 1; day <= maxDays; day++) {
                 const option = document.createElement("option");
-                option.value = `${mainlineBranch}/ipl2025/${folder}/ipl2025_results_day_${day}.csv`;
+                option.value = `${mainlineBranch}/${tournament}/${folder}/${tournament}_results_day_${day}.csv`;
                 option.textContent = `Day ${day}`;
                 select.appendChild(option);
             }
             const option = document.createElement("option");
-            option.value = `${mainlineBranch}/ipl2025/${folder}/ipl2025_results_day_final.csv`;
+            option.value = `${mainlineBranch}/${tournament}/${folder}/${tournament}_results_day_final.csv`;
             option.textContent = `Final`;
             select.appendChild(option);
         }
