@@ -4,9 +4,11 @@ const mainlineBranch = `https://raw.githubusercontent.com/suddu16/cricket-fantas
 const tournament = `t20_wc_2026`
 
 // Function to populate dropdowns for each tab
-function populateDropdowns() {
-    folders.forEach(folder => {
+async function populateDropdowns() {
+    for (const folder of folders) {
         const select = document.getElementById(`${folder}Selector`);
+        let latestDay = 1;
+        
         if (folder === 'data') {
             for (let i = 1; i <= maxDays; i++) { 
                 const filename = `${mainlineBranch}/${tournament}/data/mvp_day_${i}.csv`;
@@ -15,6 +17,13 @@ function populateDropdowns() {
                 option.value = filename;
                 option.textContent = `Day ${i}`;
                 select.appendChild(option);
+            }
+            
+            // Find the latest available day for MVP data
+            latestDay = await findLatestDay(folder, 'mvp');
+            if (latestDay > 0) {
+                select.selectedIndex = latestDay - 1; // Set to latest day (0-indexed)
+                loadCSV('data'); // Load the data for the selected day
             }
         } else {
             for (let day = 1; day <= maxDays; day++) {
@@ -27,8 +36,36 @@ function populateDropdowns() {
             option.value = `${mainlineBranch}/${tournament}/${folder}/${tournament}_results_day_final.csv`;
             option.textContent = `Final`;
             select.appendChild(option);
+            
+            // Find the latest available day for group data
+            latestDay = await findLatestDay(folder, 'results');
+            if (latestDay > 0) {
+                select.selectedIndex = latestDay - 1; // Set to latest day (0-indexed)
+            }
         }
-    });
+    }
+}
+
+// Function to find the latest available day by checking file existence
+async function findLatestDay(folder, type) {
+    for (let day = maxDays; day >= 1; day--) {
+        let filename;
+        if (type === 'mvp') {
+            filename = `${mainlineBranch}/${tournament}/data/mvp_day_${day}.csv`;
+        } else {
+            filename = `${mainlineBranch}/${tournament}/${folder}/${tournament}_results_day_${day}.csv`;
+        }
+        
+        try {
+            const response = await fetch(filename, { method: "HEAD" });
+            if (response.ok) {
+                return day; // Return the latest available day
+            }
+        } catch (error) {
+            // Continue checking previous days
+        }
+    }
+    return 1; // Default to day 1 if no files found
 }
 
 // Function to load CSV and check if it exists
@@ -192,10 +229,10 @@ function createCell(text) {
 }
 
 // Initialize on page load
-document.addEventListener("DOMContentLoaded", () => {
-    populateDropdowns();
+document.addEventListener("DOMContentLoaded", async () => {
+    await populateDropdowns();
 
-// Get the URL parameters
+    // Get the URL parameters
     const params = new URLSearchParams(window.location.search);
     const tabParam = params.get("tab");  // e.g., ?tab=group_1
     const dropdownParam = params.get("dropdown"); // e.g., ?dropdown=day_6
@@ -206,7 +243,15 @@ document.addEventListener("DOMContentLoaded", () => {
         if (tabElement) {
             const tab = new bootstrap.Tab(tabElement);
             tab.show();
+            
+            // Load data for the activated tab
+            if (tabParam === 'group_1' || tabParam === 'group_2') {
+                loadCSV(tabParam);
+            }
         }
+    } else {
+        // If no tab parameter, load Group 1 data by default (since MVP Data is already loaded)
+        loadCSV('group_1');
     }
 
     // Select the dropdown option if the parameter exists
