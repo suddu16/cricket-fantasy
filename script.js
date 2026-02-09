@@ -137,8 +137,8 @@ async function loadCSV(folder) {
             // For player groups, use the first row as header, and reverse columns for days
             const totalDays = rows[0].length - 1;
             headerRow.appendChild(createHeaderCell("Player")); // First column remains "Player"
-            for (let day = totalDays; day > 0; day--) {
-                headerRow.appendChild(createHeaderCell(`Day ${day}`));
+            for (let day = totalDays; day >= 1; day--) {
+                headerRow.appendChild(createHeaderCell(rows[0][day])); // Use actual day names from CSV
             }
         } else {
             // Other groups - Keep Player column, reverse the rest
@@ -170,28 +170,37 @@ async function loadCSV(folder) {
                 // For player groups, reverse the order and highlight changes
                 tr.appendChild(createCell(row[0])); // Player name first
                 
-                let previousValue = null;
-                for (let i = row.length - 1; i > 0; i--) {
-                    const currentValue = parseFloat(row[i]) || 0;
-                    const cell = createCell(row[i]);
+                // Build array of values in reverse order (most recent first)
+                const values = [];
+                for (let i = row.length - 1; i >= 1; i--) {
+                    values.push(parseFloat(row[i]) || 0);
+                }
+                
+                // Now iterate through values and compare with next day (which is previous chronologically)
+                for (let i = 0; i < values.length; i++) {
+                    const currentValue = values[i];
+                    const cell = createCell(currentValue.toString());
                     
-                    // Check if value changed from previous day
-                    if (previousValue !== null && currentValue !== previousValue) {
-                        if (currentValue > previousValue) {
-                            // Points increased
-                            cell.classList.add("points-increased");
-                            cell.style.backgroundColor = "#90EE90"; // Light green
-                            cell.style.fontWeight = "bold";
-                        } else if (currentValue < previousValue) {
-                            // Points decreased
-                            cell.classList.add("points-decreased");
-                            cell.style.backgroundColor = "#FFB6C6"; // Light red/pink
-                            cell.style.fontWeight = "bold";
+                    // Compare with the next value in array (previous day chronologically)
+                    if (i < values.length - 1) {
+                        const previousDayValue = values[i + 1];
+                        
+                        if (currentValue !== previousDayValue) {
+                            if (currentValue > previousDayValue) {
+                                // Points increased
+                                cell.classList.add("points-increased");
+                                cell.style.backgroundColor = "#90EE90"; // Light green
+                                cell.style.fontWeight = "bold";
+                            } else if (currentValue < previousDayValue) {
+                                // Points decreased
+                                cell.classList.add("points-decreased");
+                                cell.style.backgroundColor = "#FFB6C6"; // Light red/pink
+                                cell.style.fontWeight = "bold";
+                            }
                         }
                     }
                     
                     tr.appendChild(cell);
-                    previousValue = currentValue;
                 }
             } else {
                 // For group_1 and group_2, reverse the order for days
@@ -207,34 +216,31 @@ async function loadCSV(folder) {
         table.appendChild(tbody);
         tableDiv.appendChild(table);
 
+        // Clear message after successful load
+        messageDiv.textContent = "";
+
         // Initialize DataTable functionality
-$(document).ready(function() {
-    const tableId = table.id; // Get table ID
+        const tableId = table.id;
 
-    if (tableId.includes("dataTableData")) {
-        // For MVP data, disable sorting
-        $(table).DataTable({
-            searching: true,  
-            ordering: true, 
-            pageLength: 20,
-
-            info: true,
-            order: [[2, "desc"]] 
-    
-        });
-    } else {
-        // For group_1 and group_2, sort by the last column
-        $(table).DataTable({
-            searching: true,  
-            pageLength: 20,
-
-            ordering: true,   
-            info: true,       
-            order: [[1, "desc"]] 
-        });
-    }
-});
-
+        if (tableId.includes("dataTableData")) {
+            // For MVP data
+            $(table).DataTable({
+                searching: true,  
+                ordering: true, 
+                pageLength: 20,
+                info: true,
+                order: [[2, "desc"]] 
+            });
+        } else {
+            // For group_1 and group_2, sort by the last column
+            $(table).DataTable({
+                searching: true,  
+                pageLength: 20,
+                ordering: true,   
+                info: true,       
+                order: [[1, "desc"]] 
+            });
+        }
 
     } catch (error) {
         messageDiv.textContent = `File not found: ${filename}. Wait for it to be generated.`;
