@@ -166,8 +166,35 @@ async function loadCSV(folder) {
                 row.forEach(cell => {
                     tr.appendChild(createCell(cell));
                 });
+            } else if (folder === "group_1Players" || folder === "group_2Players") {
+                // For player groups, reverse the order and highlight changes
+                tr.appendChild(createCell(row[0])); // Player name first
+                
+                let previousValue = null;
+                for (let i = row.length - 1; i > 0; i--) {
+                    const currentValue = parseFloat(row[i]) || 0;
+                    const cell = createCell(row[i]);
+                    
+                    // Check if value changed from previous day
+                    if (previousValue !== null && currentValue !== previousValue) {
+                        if (currentValue > previousValue) {
+                            // Points increased
+                            cell.classList.add("points-increased");
+                            cell.style.backgroundColor = "#90EE90"; // Light green
+                            cell.style.fontWeight = "bold";
+                        } else if (currentValue < previousValue) {
+                            // Points decreased
+                            cell.classList.add("points-decreased");
+                            cell.style.backgroundColor = "#FFB6C6"; // Light red/pink
+                            cell.style.fontWeight = "bold";
+                        }
+                    }
+                    
+                    tr.appendChild(cell);
+                    previousValue = currentValue;
+                }
             } else {
-                // For group_1Players and group_2Players, reverse the order for days
+                // For group_1 and group_2, reverse the order for days
                 tr.appendChild(createCell(row[0])); // Player name first
                 for (let i = row.length - 1; i > 0; i--) {
                     tr.appendChild(createCell(row[i]));

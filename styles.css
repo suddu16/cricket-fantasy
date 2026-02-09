@@ -71,3 +71,24 @@ tfoot td {
     font-weight: bold;
     background: #f0f0f0;
 }
+
+/* Highlight cells where points changed from previous day */
+.points-increased {
+    background-color: #90EE90 !important; /* Light green for increases */
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.points-increased:hover {
+    background-color: #7FD87F !important; /* Slightly darker green on hover */
+}
+
+.points-decreased {
+    background-color: #FFB6C6 !important; /* Light red/pink for decreases */
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.points-decreased:hover {
+    background-color: #FFA0B4 !important; /* Slightly darker red on hover */
+}
