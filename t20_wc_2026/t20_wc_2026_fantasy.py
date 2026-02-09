@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[15]:
+# In[1]:
 
 
 import pandas as pd
@@ -27,7 +27,7 @@ pd.set_option('display.max_rows',None) #display all rows
 #  pip3 install tabulate
 
 
-# In[30]:
+# In[ ]:
 
 
 import sys
@@ -55,28 +55,28 @@ leaderboard_file = f'./{group}/{tournament}_leaderboard.txt'
 ipl_mock_auction_summary = f'./{group}/AuctionSummary.csv'
 
 
-# In[17]:
+# In[3]:
 
 
 mvp_df = pd.read_csv(f'./data/mvp_{day}.csv')
 mvp_df
 
 
-# In[18]:
+# In[4]:
 
 
 fantasy_teams_auction_df = pd.read_csv(ipl_mock_auction_summary)
 fantasy_teams_auction_df
 
 
-# In[19]:
+# In[ ]:
 
 
 fantasy_mgrs = fantasy_teams_auction_df.columns
 fantasy_mgrs.to_list()
 
 
-# In[20]:
+# In[ ]:
 
 
 import os
@@ -95,7 +95,7 @@ for mgr in fantasy_teams_df.columns:
 fantasy_teams_df
 
 
-# In[22]:
+# In[ ]:
 
 
 from thefuzz import fuzz
@@ -130,13 +130,13 @@ for mgr in fantasy_mgrs:
         print(f'All players have min fantasy points.')
 
 
-# In[14]:
+# In[ ]:
 
 
 scores
 
 
-# In[18]:
+# In[ ]:
 
 
 prev_scores = pd.read_csv(prev_results_file, header=None)
@@ -148,20 +148,20 @@ prev_scores_dicts = prev_scores.to_dict(orient='records')
 prev_scores_dicts
 
 
-# In[19]:
+# In[ ]:
 
 
 current_scores_dict = prev_scores_dicts + [scores]
 
 
-# In[20]:
+# In[ ]:
 
 
 graph_scores = pd.DataFrame(current_scores_dict)
 graph_scores
 
 
-# In[21]:
+# In[ ]:
 
 
 graph_scores_t = graph_scores.T
@@ -170,19 +170,29 @@ graph_scores_t.to_csv(results_file, header=False)
 graph_scores_t
 
 
-# In[22]:
+# In[19]:
 
 
 import matplotlib.pyplot as plt
 ax = graph_scores.plot.line(marker='o')
 #ax.set_xlabel("Days")
 ax.set_ylabel("Points")
-plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+# Create legend labels with final scores, sorted by points (descending)
+final_scores = graph_scores.iloc[-1]
+sorted_cols = final_scores.sort_values(ascending=False).index
+# Get handles and labels from the plot
+handles, labels = ax.get_legend_handles_labels()
+# Create a mapping of original column names to handles
+handle_dict = dict(zip(graph_scores.columns, handles))
+# Reorder handles and create new labels based on sorted columns
+sorted_handles = [handle_dict[col] for col in sorted_cols]
+sorted_labels = [f"{col} ({int(final_scores[col])})" for col in sorted_cols]
+plt.legend(sorted_handles, sorted_labels, bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
 plt.savefig(leaderboard_graph_file, bbox_inches="tight")
 plt.show()
 
 
-# In[23]:
+# In[20]:
 
 
 scores_sorted = {k: v for k, v in sorted(scores.items(), key=lambda item: item[1], reverse=True)}
