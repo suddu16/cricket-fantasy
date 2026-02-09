@@ -41,6 +41,7 @@ async function populateDropdowns() {
             latestDay = await findLatestDay(folder, 'results');
             if (latestDay > 0) {
                 select.selectedIndex = latestDay - 1; // Set to latest day (0-indexed)
+                loadCSV(folder); // Load the data for the selected day
             }
         }
     }
@@ -181,8 +182,19 @@ async function loadCSV(folder) {
                     const currentValue = values[i];
                     const cell = createCell(currentValue.toString());
                     
-                    // Compare with the next value in array (previous day chronologically)
-                    if (i < values.length - 1) {
+                    // For the last column (Day 1), highlight any non-zero value
+                    if (i === values.length - 1) {
+                        if (currentValue > 0) {
+                            cell.classList.add("points-increased");
+                            cell.style.backgroundColor = "#90EE90"; // Light green for positive
+                            cell.style.fontWeight = "bold";
+                        } else if (currentValue < 0) {
+                            cell.classList.add("points-decreased");
+                            cell.style.backgroundColor = "#FFB6C6"; // Light red/pink for negative
+                            cell.style.fontWeight = "bold";
+                        }
+                    } else {
+                        // Compare with the next value in array (previous day chronologically)
                         const previousDayValue = values[i + 1];
                         
                         if (currentValue !== previousDayValue) {
@@ -277,14 +289,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             const tab = new bootstrap.Tab(tabElement);
             tab.show();
             
-            // Load data for the activated tab
+            // Load data for the activated tab if not already loaded
             if (tabParam === 'group_1' || tabParam === 'group_2') {
                 loadCSV(tabParam);
             }
         }
-    } else {
-        // If no tab parameter, load Group 1 data by default (since MVP Data is already loaded)
-        loadCSV('group_1');
     }
 
     // Select the dropdown option if the parameter exists
