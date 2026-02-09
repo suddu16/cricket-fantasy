@@ -2,7 +2,7 @@
 ```
 | Manager      |   Points |
 |:-------------|---------:|
-| shashaank    |      712 |
+| ds&ps        |      712 |
 | ColdTaker    |      620 |
 | sk           |      522 |
 | neela        |      452 |

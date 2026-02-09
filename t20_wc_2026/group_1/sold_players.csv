@@ -12,8 +12,8 @@ Phil Salt,ENG,Wicketkeeper,1,30.0,ntkesh,2026-02-07 03:44:24
 Brendan Taylor,ZIM,Wicketkeeper,0.5,4.0,AkshayM,2026-02-07 03:45:24
 Axar Patel,IND,All-Rounder,1,19.0,mahaarajanmg,2026-02-07 03:47:32
 Saim Ayub,PAK,Batsman,1,10.0,Sriram,2026-02-07 03:50:14
-Glenn Maxwell,AUS,All-Rounder,1,14.0,shashaank,2026-02-07 03:57:25
-Romario Shepherd,WI,All-Rounder,1,12.0,shashaank,2026-02-07 03:58:35
+Glenn Maxwell,AUS,All-Rounder,1,14.0,ds&ps,2026-02-07 03:57:25
+Romario Shepherd,WI,All-Rounder,1,12.0,ds&ps,2026-02-07 03:58:35
 Cameron Green,AUS,All-Rounder,1,20.0,ColdTaker,2026-02-07 03:59:48
 Keshav Maharaj,SA,Bowler,1,8.5,mahaarajanmg,2026-02-07 04:01:14
 Ben Duckett,ENG,Batsman,1,1.5,mahaarajanmg,2026-02-07 04:03:48
@@ -23,7 +23,7 @@ Abhishek Sharma,IND,Batsman,1,32.0,ColdTaker,2026-02-07 04:12:17
 Sam Curran,ENG,All-Rounder,1,10.0,sk,2026-02-07 04:13:43
 Mitchell Santner,NZ,All-Rounder,1,17.0,sk,2026-02-07 04:15:20
 Sahibzada Farhan,PAK,Wicketkeeper,1,2.5,sudarshan,2026-02-07 04:17:44
-Paul Stirling,IRE,Batsman,0.5,2.0,shashaank,2026-02-07 04:19:23
+Paul Stirling,IRE,Batsman,0.5,2.0,ds&ps,2026-02-07 04:19:23
 Matt Henry,NZ,Bowler,1,9.5,neela,2026-02-07 04:22:20
 Matheesha Pathirana,SL,Bowler,1,10.0,sudarshan,2026-02-07 04:24:11
 Jamie Overton,ENG,All-Rounder,1,7.0,ntkesh,2026-02-07 04:25:37
@@ -42,11 +42,11 @@ Jason Smith,SA,Batsman,1,5.5,sudarshan,2026-02-07 04:54:50
 Dushmantha Chameera,SL,Bowler,1,4.0,AkshayM,2026-02-07 04:56:14
 Fazalhaq Farooqi,AFG,Bowler,1,4.0,sk,2026-02-07 04:57:28
 Jacob Duffy,NZ,Bowler,1,8.5,Sriram,2026-02-07 05:00:17
-Josh Inglis,AUS,Wicketkeeper,1,9.5,shashaank,2026-02-07 05:03:16
-Shimron Hetmyer,WI,Batsman,1,14.0,shashaank,2026-02-07 05:05:34
+Josh Inglis,AUS,Wicketkeeper,1,9.5,ds&ps,2026-02-07 05:03:16
+Shimron Hetmyer,WI,Batsman,1,14.0,ds&ps,2026-02-07 05:05:34
 Mujeeb Ur Rahman,AFG,Bowler,1,2.0,ColdTaker,2026-02-07 05:06:42
 Tim David,AUS,Batsman,1,7.0,Sriram,2026-02-07 05:08:08
-Will Jacks,ENG,All-Rounder,1,9.5,shashaank,2026-02-07 05:10:13
+Will Jacks,ENG,All-Rounder,1,9.5,ds&ps,2026-02-07 05:10:13
 Shadab Khan,PAK,All-Rounder,1,1.0,AkshayM,2026-02-07 05:11:27
 Salman Agha,PAK,Batsman,1,2.0,ntkesh,2026-02-07 05:12:37
 Ryan Rickelton,SA,Wicketkeeper,1,3.5,Sriram,2026-02-07 05:15:21
@@ -55,10 +55,10 @@ Shivam Dube,IND,All-Rounder,1,10.0,Sriram,2026-02-07 05:18:34
 Aiden Markram,SA,All-Rounder,1,13.0,ntkesh,2026-02-07 05:21:42
 Adam Zampa,AUS,Bowler,1,11.0,sudarshan,2026-02-07 05:23:48
 Dewald Brevis,SA,Batsman,1,28.0,sudarshan,2026-02-07 05:28:37
-Jos Buttler,ENG,Wicketkeeper,1,22.0,shashaank,2026-02-07 05:30:49
+Jos Buttler,ENG,Wicketkeeper,1,22.0,ds&ps,2026-02-07 05:30:49
 Arshdeep Singh,IND,Bowler,1,21.0,mahaarajanmg,2026-02-07 05:31:53
 Maheesh Theekshana,SL,Bowler,1,1.0,ColdTaker,2026-02-07 05:32:58
-Mitchell Marsh,AUS,Batsman,1,20.0,shashaank,2026-02-07 05:33:54
+Mitchell Marsh,AUS,Batsman,1,20.0,ds&ps,2026-02-07 05:33:54
 Sikandar Raza,ZIM,All-Rounder,0.5,0.5,neela,2026-02-07 05:35:25
 Shai Hope,WI,Wicketkeeper,1,3.5,mahaarajanmg,2026-02-07 05:37:15
 Pathum Nissanka,SL,Batsman,1,12.0,Sriram,2026-02-07 05:40:54
@@ -95,6 +95,6 @@ Sediqullah Atal,AFG,Batsman,1,1.0,ntkesh,2026-02-07 07:12:22
 Dasun Shanaka,SL,Batsman,1,1.0,sk,2026-02-07 07:13:22
 Tristan Stubbs,SA,Wicketkeeper,1,1.0,sk,2026-02-07 07:15:22
 Salman Mirza,PAK,Bowler,1,1.0,neela,2026-02-07 07:14:22
-Shamar Joseph,WI,Bowler,1,1.0,shashaank,2026-02-07 07:16:22
-Anrich Nortje,SA,Bowler,1,1.0,shashaank,2026-02-07 07:16:22
-Gudakesh Motie,WI,Bowler,1,1.0,shashaank,2026-02-07 07:16:22
+Shamar Joseph,WI,Bowler,1,1.0,ds&ps,2026-02-07 07:16:22
+Anrich Nortje,SA,Bowler,1,1.0,ds&ps,2026-02-07 07:16:22
+Gudakesh Motie,WI,Bowler,1,1.0,ds&ps,2026-02-07 07:16:22
