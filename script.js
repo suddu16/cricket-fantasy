@@ -3,6 +3,9 @@ const maxDays = 31;
 const mainlineBranch = `https://raw.githubusercontent.com/suddu16/cricket-fantasy/main`;
 const tournament = `t20_wc_2026`
 
+// Store chart instances to destroy before recreating
+let chartInstances = {};
+
 // Function to populate dropdowns for each tab
 async function populateDropdowns() {
     for (const folder of folders) {
@@ -231,6 +234,11 @@ async function loadCSV(folder) {
         // Clear message after successful load
         messageDiv.textContent = "";
 
+        // Create chart for group_1 if applicable
+        if (folder === "group_1") {
+            await createProgressionChart(folder, rows);
+        }
+
         // Initialize DataTable functionality
         const tableId = table.id;
 
@@ -308,3 +316,327 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 });
+
+
+// Function to create progression chart for Group 1
+async function createProgressionChart(folder, currentDayData) {
+    const canvasId = `${folder}Chart`;
+    const canvas = document.getElementById(canvasId);
+    
+    if (!canvas) return;
+
+    // Destroy existing chart if it exists
+    if (chartInstances[canvasId]) {
+        chartInstances[canvasId].destroy();
+    }
+
+    // Get the selected day from dropdown
+    const select = document.getElementById(`${folder}Selector`);
+    const selectedOption = select.options[select.selectedIndex].text;
+    const currentDay = parseInt(selectedOption.replace('Day ', ''));
+
+    // Fetch data from Day 0 to current day
+    const allDaysData = [];
+    
+    for (let day = 0; day <= currentDay; day++) {
+        try {
+            const filename = `${mainlineBranch}/${tournament}/${folder}/${tournament}_results_day_${day}.csv`;
+            const response = await fetch(filename);
+            
+            if (response.ok) {
+                const csvText = await response.text();
+                const rows = csvText.split("\n")
+                    .map(row => row.trim())
+                    .filter(row => row.length > 0)
+                    .map(row => row.split(","))
+                    .filter(row => row.length > 1 && row[0] && row[0].trim() !== '');
+                
+                console.log(`Day ${day}: Found ${rows.length - 1} players`); // Debug log
+                allDaysData.push({ day, rows });
+            }
+        } catch (error) {
+            console.log(`Day ${day} data not available`);
+        }
+    }
+
+    if (allDaysData.length === 0) return;
+
+    // Extract player names from the first available day (skip header if it exists)
+    const firstDayRows = allDaysData[0].rows;
+    // Check if first row is a header by seeing if it has non-numeric values in the points column
+    const hasHeader = isNaN(parseFloat(firstDayRows[0][firstDayRows[0].length - 1]));
+    const playerNames = hasHeader ? firstDayRows.slice(1).map(row => row[0]) : firstDayRows.map(row => row[0]);
+
+    // Generate colors for each player
+    const colors = generateColors(playerNames.length);
+
+    // Build datasets for each player
+    const datasets = playerNames.map((playerName, index) => {
+        const data = allDaysData.map(dayData => {
+            const startIndex = hasHeader ? 1 : 0;
+            const playerRow = dayData.rows.slice(startIndex).find(row => row[0] === playerName);
+            if (playerRow) {
+                // Get the total points (last column)
+                return parseFloat(playerRow[playerRow.length - 1]) || 0;
+            }
+            return 0;
+        });
+
+        return {
+            label: playerName,
+            data: data,
+            borderColor: colors[index],
+            backgroundColor: colors[index] + '33', // Add transparency
+            borderWidth: 2,
+            tension: 0.1,
+            pointRadius: 4,
+            pointHoverRadius: 6
+        };
+    });
+
+    // Create labels for x-axis
+    const labels = allDaysData.map(d => `Day ${d.day}`);
+
+    // Create the chart
+    const ctx = canvas.getContext('2d');
+    chartInstances[canvasId] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Points Progression Over Time',
+                    font: {
+                        size: 16
+                    }
+                },
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 10,
+                        font: {
+                            size: 11
+                        }
+                    }
+                },
+                tooltip: {
+                    enabled: true,
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            return tooltipItems[0].label;
+                        },
+                        beforeBody: function(tooltipItems) {
+                            // Sort players by points (descending)
+                            const sorted = tooltipItems.sort((a, b) => b.parsed.y - a.parsed.y);
+                            return '';
+                        },
+                        label: function(context) {
+                            const datasetIndex = context.datasetIndex;
+                            const dayIndex = context.dataIndex;
+                            const playerName = context.dataset.label;
+                            const points = context.parsed.y;
+                            
+                            // Calculate current position
+                            const allPlayersAtDay = context.chart.data.datasets.map((ds, idx) => ({
+                                name: ds.label,
+                                points: ds.data[dayIndex],
+                                index: idx
+                            })).sort((a, b) => b.points - a.points);
+                            
+                            const currentPosition = allPlayersAtDay.findIndex(p => p.name === playerName) + 1;
+                            
+                            // Calculate position change
+                            let positionChange = '';
+                            let arrow = '';
+                            if (dayIndex > 0) {
+                                const allPlayersAtPrevDay = context.chart.data.datasets.map((ds, idx) => ({
+                                    name: ds.label,
+                                    points: ds.data[dayIndex - 1],
+                                    index: idx
+                                })).sort((a, b) => b.points - a.points);
+                                
+                                const prevPosition = allPlayersAtPrevDay.findIndex(p => p.name === playerName) + 1;
+                                const change = prevPosition - currentPosition;
+                                
+                                if (change > 0) {
+                                    arrow = '▲';
+                                    positionChange = ` ${arrow}${change}`;
+                                } else if (change < 0) {
+                                    arrow = '▼';
+                                    positionChange = ` ${arrow}${Math.abs(change)}`;
+                                } else {
+                                    arrow = '━';
+                                    positionChange = ` ${arrow}`;
+                                }
+                            }
+                            
+                            return `#${currentPosition} ${playerName}: ${points} pts${positionChange}`;
+                        },
+                        labelTextColor: function(context) {
+                            return context.dataset.borderColor;
+                        }
+                    },
+                    itemSort: function(a, b) {
+                        // Sort tooltip items by points (descending)
+                        return b.parsed.y - a.parsed.y;
+                    }
+                },
+                annotation: {
+                    annotations: {}
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Total Points'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Day'
+                    }
+                }
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            }
+        }
+    });
+
+    // Create rankings display
+    const chart = chartInstances[canvasId];
+    const lastDataIndex = labels.length - 1;
+    
+    // Create a color map for all players
+    const playerColorMap = {};
+    datasets.forEach((dataset, idx) => {
+        playerColorMap[dataset.label] = dataset.borderColor;
+    });
+    
+    updateRankingsDisplay(folder, allDaysData, lastDataIndex, playerColorMap);
+    
+    // Update rankings display on hover
+    canvas.addEventListener('mousemove', (event) => {
+        const points = chart.getElementsAtEventForMode(event, 'index', { intersect: false }, false);
+        if (points.length > 0) {
+            const dayIndex = points[0].index;
+            updateRankingsDisplay(folder, allDaysData, dayIndex, playerColorMap);
+        }
+    });
+    
+    // Restore latest day rankings when mouse leaves
+    canvas.addEventListener('mouseleave', () => {
+        updateRankingsDisplay(folder, allDaysData, lastDataIndex, playerColorMap);
+    });
+}
+
+// Function to update the rankings display
+function updateRankingsDisplay(folder, allDaysData, dayIndex, playerColorMap) {
+    const rankingsList = document.getElementById(`${folder}RankingsList`);
+    if (!rankingsList) return;
+    
+    const dayData = allDaysData[dayIndex];
+    const day = dayData.day;
+    
+    // Check if first row is a header
+    const hasHeader = isNaN(parseFloat(dayData.rows[0][dayData.rows[0].length - 1]));
+    const startIndex = hasHeader ? 1 : 0;
+    
+    // Get player data for this day
+    const players = dayData.rows.slice(startIndex).map(row => ({
+        name: row[0],
+        points: parseFloat(row[row.length - 1]) || 0
+    }));
+    
+    // Sort by points descending
+    players.sort((a, b) => b.points - a.points);
+    
+    // Calculate position changes if not day 0
+    let positionChanges = {};
+    if (dayIndex > 0) {
+        const prevDayData = allDaysData[dayIndex - 1];
+        const prevHasHeader = isNaN(parseFloat(prevDayData.rows[0][prevDayData.rows[0].length - 1]));
+        const prevStartIndex = prevHasHeader ? 1 : 0;
+        
+        const prevPlayers = prevDayData.rows.slice(prevStartIndex).map(row => ({
+            name: row[0],
+            points: parseFloat(row[row.length - 1]) || 0
+        }));
+        prevPlayers.sort((a, b) => b.points - a.points);
+        
+        const prevPositions = {};
+        prevPlayers.forEach((p, idx) => prevPositions[p.name] = idx + 1);
+        
+        players.forEach((p, idx) => {
+            const currentPos = idx + 1;
+            const prevPos = prevPositions[p.name] || currentPos;
+            const change = prevPos - currentPos;
+            positionChanges[p.name] = change;
+        });
+    }
+    
+    // Build HTML
+    let html = `<div class="mb-2 text-center"><strong>Day ${day}</strong></div>`;
+    
+    players.forEach((player, idx) => {
+        const position = idx + 1;
+        const change = positionChanges[player.name] || 0;
+        let arrow = '';
+        let changeClass = '';
+        
+        if (change > 0) {
+            arrow = `<span class="text-success">▲${change}</span>`;
+            changeClass = 'border-success';
+        } else if (change < 0) {
+            arrow = `<span class="text-danger">▼${Math.abs(change)}</span>`;
+            changeClass = 'border-danger';
+        } else if (dayIndex > 0) {
+            arrow = `<span class="text-secondary">━</span>`;
+        }
+        
+        // Find player color from the map
+        const playerColor = playerColorMap[player.name] || '#999';
+        
+        html += `
+            <div class="d-flex align-items-center mb-2 p-2 border-start border-3 ${changeClass}" style="border-left-color: ${playerColor} !important; font-size: 0.9rem;">
+                <div class="me-2" style="min-width: 25px;"><strong>#${position}</strong></div>
+                <div class="flex-grow-1">${player.name}</div>
+                <div class="me-2"><strong>${player.points}</strong> pts</div>
+                <div style="min-width: 30px; text-align: center;">${arrow}</div>
+            </div>
+        `;
+    });
+    
+    rankingsList.innerHTML = html;
+}
+// Helper function to generate distinct colors for players
+function generateColors(count) {
+    const colors = [
+        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+        '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384',
+        '#36A2EB', '#FFCE56', '#8B4513', '#2E8B57', '#DC143C'
+    ];
+    
+    // If we need more colors than predefined, generate random ones
+    while (colors.length < count) {
+        colors.push('#' + Math.floor(Math.random()*16777215).toString(16));
+    }
+    
+    return colors.slice(0, count);
+}
+
