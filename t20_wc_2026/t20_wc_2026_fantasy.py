@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[21]:
 
 
 import pandas as pd
@@ -55,28 +55,28 @@ leaderboard_file = f'./{group}/{tournament}_leaderboard.txt'
 ipl_mock_auction_summary = f'./{group}/AuctionSummary.csv'
 
 
-# In[3]:
+# In[24]:
 
 
 mvp_df = pd.read_csv(f'./data/mvp_{day}.csv')
 mvp_df
 
 
-# In[4]:
+# In[25]:
 
 
 fantasy_teams_auction_df = pd.read_csv(ipl_mock_auction_summary)
 fantasy_teams_auction_df
 
 
-# In[ ]:
+# In[26]:
 
 
 fantasy_mgrs = fantasy_teams_auction_df.columns
 fantasy_mgrs.to_list()
 
 
-# In[ ]:
+# In[27]:
 
 
 import os
@@ -95,7 +95,7 @@ for mgr in fantasy_teams_df.columns:
 fantasy_teams_df
 
 
-# In[ ]:
+# In[28]:
 
 
 from thefuzz import fuzz
@@ -130,13 +130,13 @@ for mgr in fantasy_mgrs:
         print(f'All players have min fantasy points.')
 
 
-# In[ ]:
+# In[29]:
 
 
 scores
 
 
-# In[ ]:
+# In[30]:
 
 
 prev_scores = pd.read_csv(prev_results_file, header=None)
@@ -148,20 +148,20 @@ prev_scores_dicts = prev_scores.to_dict(orient='records')
 prev_scores_dicts
 
 
-# In[ ]:
+# In[31]:
 
 
 current_scores_dict = prev_scores_dicts + [scores]
 
 
-# In[ ]:
+# In[32]:
 
 
 graph_scores = pd.DataFrame(current_scores_dict)
 graph_scores
 
 
-# In[ ]:
+# In[33]:
 
 
 graph_scores_t = graph_scores.T
@@ -170,7 +170,7 @@ graph_scores_t.to_csv(results_file, header=False)
 graph_scores_t
 
 
-# In[19]:
+# In[36]:
 
 
 import matplotlib.pyplot as plt
@@ -180,19 +180,54 @@ ax.set_ylabel("Points")
 # Create legend labels with final scores, sorted by points (descending)
 final_scores = graph_scores.iloc[-1]
 sorted_cols = final_scores.sort_values(ascending=False).index
+
+# Calculate position changes (if there are at least 2 days of data)
+position_changes = {}
+if len(graph_scores) >= 2:
+    prev_scores = graph_scores.iloc[-2]
+    prev_sorted = prev_scores.sort_values(ascending=False).index
+
+    # Create position mappings
+    prev_positions = {col: idx for idx, col in enumerate(prev_sorted)}
+    curr_positions = {col: idx for idx, col in enumerate(sorted_cols)}
+
+    # Calculate changes (negative means moved up, positive means moved down)
+    for col in sorted_cols:
+        if col in prev_positions:
+            position_changes[col] = prev_positions[col] - curr_positions[col]
+        else:
+            position_changes[col] = 0
+else:
+    # No previous data, all changes are 0
+    for col in sorted_cols:
+        position_changes[col] = 0
+
 # Get handles and labels from the plot
 handles, labels = ax.get_legend_handles_labels()
 # Create a mapping of original column names to handles
 handle_dict = dict(zip(graph_scores.columns, handles))
-# Reorder handles and create new labels based on sorted columns
+# Reorder handles and create new labels based on sorted columns with position change indicators
 sorted_handles = [handle_dict[col] for col in sorted_cols]
-sorted_labels = [f"{col} ({int(final_scores[col])})" for col in sorted_cols]
-plt.legend(sorted_handles, sorted_labels, bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+sorted_labels = []
+for col in sorted_cols:
+    change = position_changes[col]
+    if change > 0:
+        # Upward triangle for improvement (will be colored green)
+        indicator = f" ▲{change}"
+    elif change < 0:
+        # Downward triangle for decline (will be colored red)
+        indicator = f" ▼{abs(change)}"
+    else:
+        indicator = ""
+    sorted_labels.append(f"{col} ({int(final_scores[col])}){indicator}")
+
+legend = plt.legend(sorted_handles, sorted_labels, bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
+
 plt.savefig(leaderboard_graph_file, bbox_inches="tight")
 plt.show()
 
 
-# In[20]:
+# In[ ]:
 
 
 scores_sorted = {k: v for k, v in sorted(scores.items(), key=lambda item: item[1], reverse=True)}
