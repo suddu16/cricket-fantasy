@@ -1,14 +1,14 @@
-*DAY_5*
+*DAY_6*
 ```
 | Manager      |   Points |
 |:-------------|---------:|
-| sudarshan    |     1400 |
-| ColdTaker    |     1279 |
+| sk           |     1533 |
+| ColdTaker    |     1458 |
+| sudarshan    |     1440 |
+| AkshayM      |     1261 |
 | neela        |     1210 |
-| AkshayM      |     1192 |
+| Sriram       |     1138 |
 | ds&ps        |     1133 |
-| sk           |     1007 |
-| mahaarajanmg |      964 |
-| Sriram       |      778 |
-| ntkesh       |      736 |
+| ntkesh       |     1079 |
+| mahaarajanmg |     1074 |
 ```
