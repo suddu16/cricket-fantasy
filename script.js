@@ -235,8 +235,9 @@ async function loadCSV(folder) {
         messageDiv.textContent = "";
 
         // Create chart for group_1 if applicable
-        if (folder === "group_1") {
+        if (folder === "group_1" || folder === "group_2") {
             await createProgressionChart(folder, rows);
+            await displayDailyPointsAndTopScorer(folder, rows);
         }
 
         // Initialize DataTable functionality
@@ -640,3 +641,175 @@ function generateColors(count) {
     return colors.slice(0, count);
 }
 
+
+
+// Function to display daily points and top scorer
+async function displayDailyPointsAndTopScorer(folder, currentDayData) {
+    const select = document.getElementById(`${folder}Selector`);
+    const selectedOption = select.options[select.selectedIndex].text;
+    
+    // Handle "Final" option
+    if (selectedOption === 'Final') {
+        return; // Skip for final day
+    }
+    
+    const currentDay = parseInt(selectedOption.replace('Day ', ''));
+    
+    // Skip Day 0 as there's no previous day
+    if (currentDay === 0) {
+        return;
+    }
+    
+    try {
+        // Data structure after table processing:
+        // Each row is a PLAYER
+        // currentDayData[0] = [playerName, day0Points, day1Points, day2Points, ...]
+        // currentDayData[1] = [playerName, day0Points, day1Points, day2Points, ...]
+        
+        console.log('=== DEBUG: displayDailyPointsAndTopScorer ===');
+        console.log('Current Day:', currentDay);
+        console.log('Full currentDayData:', currentDayData);
+        
+        // Calculate daily points for each player
+        const dailyPoints = [];
+        
+        // For tracking best single day performance across all days
+        let bestSingleDayPoints = -Infinity;
+        let bestSingleDayPlayer = [];
+        let bestSingleDayNumber = 0;
+        
+        // Column index for current day (column 0 is player name, column 1 is day 0, column 2 is day 1, etc.)
+        const currentDayColIndex = currentDay + 1;
+        const prevDayColIndex = currentDay; // Previous day column
+        
+        console.log('Current Day Column Index:', currentDayColIndex);
+        console.log('Previous Day Column Index:', prevDayColIndex);
+        
+        // Iterate through each player (each row)
+        for (let row = 0; row < currentDayData.length; row++) {
+            const playerRow = currentDayData[row];
+            
+            // Check if row has enough columns
+            if (playerRow.length <= currentDayColIndex) {
+                console.log(`Row ${row} doesn't have enough columns`);
+                continue;
+            }
+            
+            const playerName = playerRow[0]; // First column is player name
+            const currentPoints = parseFloat(playerRow[currentDayColIndex]) || 0;
+            const prevPoints = parseFloat(playerRow[prevDayColIndex]) || 0;
+            const points = currentPoints - prevPoints;
+            
+            console.log(`Player: ${playerName}, Current: ${currentPoints}, Prev: ${prevPoints}, Daily: ${points}`);
+            
+            dailyPoints.push({
+                name: playerName,
+                points: points
+            });
+            
+            // Check all days for this player to find their best single day
+            for (let dayCol = 1; dayCol <= currentDayColIndex; dayCol++) {
+                const dayPoints = parseFloat(playerRow[dayCol]) || 0;
+                const prevDayPoints = parseFloat(playerRow[dayCol - 1]) || 0;
+                const dailyScore = dayPoints - prevDayPoints;
+                
+                if (dailyScore > bestSingleDayPoints) {
+                    bestSingleDayPoints = dailyScore;
+                    bestSingleDayPlayer = [playerName];
+                    bestSingleDayNumber = dayCol - 1; // dayCol 1 = day 0, dayCol 2 = day 1, etc.
+                } else if (dailyScore === bestSingleDayPoints && dailyScore > 0) {
+                    if (!bestSingleDayPlayer.includes(playerName)) {
+                        bestSingleDayPlayer.push(playerName);
+                    }
+                }
+            }
+        }
+        
+        console.log('Daily Points:', dailyPoints);
+        console.log('Best Single Day:', bestSingleDayPlayer, 'with', bestSingleDayPoints, 'points on Day', bestSingleDayNumber);
+        
+        // Sort by points descending
+        dailyPoints.sort((a, b) => b.points - a.points);
+        
+        // Create the display section
+        const tableDiv = document.getElementById(`${folder}Table`);
+        
+        // Create container for daily stats
+        const statsContainer = document.createElement('div');
+        statsContainer.className = 'row mt-4 mb-4';
+        statsContainer.id = `${folder}DailyStats`;
+        
+        // Best single day performance card
+        const topScorerCard = document.createElement('div');
+        topScorerCard.className = 'col-md-4';
+        topScorerCard.innerHTML = `
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <strong>🏆 Best Single Day Performance</strong>
+                </div>
+                <div class="card-body text-center">
+                    <h3 class="text-warning">${bestSingleDayPlayer.join(', ')}</h3>
+                    <h4>${bestSingleDayPoints.toFixed(1)} points</h4>
+                    <p class="mb-0 text-muted">on Day ${bestSingleDayNumber}</p>
+                </div>
+            </div>
+        `;
+        
+        // Daily points table card
+        const dailyPointsCard = document.createElement('div');
+        dailyPointsCard.className = 'col-md-8';
+        
+        let dailyPointsHTML = `
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <strong>📊 Points Scored on Day ${currentDay}</strong>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Player</th>
+                                <th>Points</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+        `;
+        
+        dailyPoints.forEach((player, idx) => {
+            const rowClass = idx === 0 ? 'table-warning' : '';
+            dailyPointsHTML += `
+                <tr class="${rowClass}">
+                    <td><strong>${idx + 1}</strong></td>
+                    <td>${player.name}</td>
+                    <td><strong>${player.points.toFixed(1)}</strong></td>
+                </tr>
+            `;
+        });
+        
+        dailyPointsHTML += `
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+        
+        dailyPointsCard.innerHTML = dailyPointsHTML;
+        
+        // Add cards to container
+        statsContainer.appendChild(topScorerCard);
+        statsContainer.appendChild(dailyPointsCard);
+        
+        // Remove existing stats if present
+        const existingStats = document.getElementById(`${folder}DailyStats`);
+        if (existingStats) {
+            existingStats.remove();
+        }
+        
+        // Insert before the table
+        tableDiv.parentNode.insertBefore(statsContainer, tableDiv);
+        
+    } catch (error) {
+        console.error('Error calculating daily points:', error);
+    }
+}
