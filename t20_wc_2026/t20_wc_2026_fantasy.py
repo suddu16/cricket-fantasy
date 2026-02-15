@@ -14,11 +14,10 @@ import matplotlib.pyplot as plt
 pd.set_option('display.max_colwidth', 200)
 pd.set_option('display.max_columns', None)
 
-# Group Argument
 if len(sys.argv) > 1:
     group = sys.argv[1]
 else:
-    group = 'group_1' # Default if forgot to type it
+    group = 'group_1' 
 
 print(f"📂 Working on Group: {group}")
 
@@ -29,12 +28,19 @@ day_num = abs((ipl_day_cur - ipl_day_0).days)
 day = 'day_' + str(day_num)
 prev_day = 'day_' + str(day_num - 1)
 
-# --- AUTO-FIX: Fallback if today's data is missing ---
+# --- SMART FALLBACK LOGIC ---
 if not os.path.exists(f'./data/mvp_{day}.csv'):
-    print(f"⚠️  Data for {day} not found. Falling back to 'day_1' for demo.")
-    day = 'day_1'
-    prev_day = 'day_0'
-# -----------------------------------------------------
+    print(f"⚠️  Data for {day} (Today) not found.")
+    day = prev_day 
+    prev_day_num = int(day.split('_')[1]) - 1
+    prev_day = f'day_{prev_day_num}'
+    print(f"🔄 Falling back to {day} (Yesterday) for the report.")
+
+    if not os.path.exists(f'./data/mvp_{day}.csv'):
+         print(f"❌ Yesterday's data also missing. Defaulting to day_1.")
+         day = 'day_1'
+         prev_day = 'day_0'
+# ----------------------------
 
 print(f"📅 Processing for: {day}")
 
@@ -48,19 +54,19 @@ ipl_mock_auction_summary = f'./{group}/AuctionSummary.csv'
 # ==========================================
 # 2. LOAD DATA
 # ==========================================
-# Load MVP Points
 try:
     mvp_df = pd.read_csv(f'./data/mvp_{day}.csv')
+    # Normalize player names in MVP data for better matching
+    mvp_df['Player'] = mvp_df['Player'].astype(str).str.lower().str.strip()
 except FileNotFoundError:
-    print(f"❌ Error: Could not find ./data/mvp_{day}.csv. Make sure data exists.")
+    print(f"❌ Error: Could not find ./data/mvp_{day}.csv.")
     sys.exit(1)
 
-# Load Teams
 fantasy_teams_auction_df = pd.read_csv(ipl_mock_auction_summary)
 fantasy_mgrs = fantasy_teams_auction_df.columns.to_list()
 
 # Standardize Strings
-fantasy_teams_df = fantasy_teams_auction_df.apply(lambda x: x.astype(str).str.lower())
+fantasy_teams_df = fantasy_teams_auction_df.apply(lambda x: x.astype(str).str.lower().str.strip())
 
 # Load/Create Manager CSVs
 fantasy_teams_df_per_mgr = {}
@@ -87,50 +93,42 @@ for mgr in fantasy_mgrs:
     mvp_players_with_pts = mvp_df['Player'].to_list()
     
     for i in range(len(fantasy_teams_df[mgr])):
-        player_name = str(fantasy_teams_df[mgr].iloc[i]).lower()
+        player_name = str(fantasy_teams_df[mgr].iloc[i])
         
         if player_name in mvp_players_with_pts:
-            # Exact Match
-            player_score = float(mvp_df.loc[mvp_df['Player'] == fantasy_teams_df[mgr].iloc[i],'Pts'].iloc[0])
+            player_score = float(mvp_df.loc[mvp_df['Player'] == player_name, 'Pts'].iloc[0])
             scores[mgr] += player_score
             mgr_day_pts[player_name] = player_score
         else:
-            # Fuzzy Match
             closest_match = process.extractOne(player_name, mvp_players_with_pts)
+            # You could add logic here to auto-correct, but for now we set to 0
             mgr_day_pts[player_name] = 0.0
             
-    # Update Manager File
     mgr_df[f'{day}'] = mgr_df.iloc[:, 0].map(mgr_day_pts)
     mgr_df = mgr_df.reindex(sorted(mgr_df.columns, key = lambda x: int(x.split("_")[1] if '_' in x else 0)), axis=1)
     mgr_df.to_csv(mgr_file, index=False)
 
 # ==========================================
-# 4. 🚀 INSTANT LEADERBOARD (OPTIMIZED)
+# 4. 🚀 INSTANT LEADERBOARD
 # ==========================================
 print("\n" + "="*40)
 print(f" 🏆 MANAGER STANDINGS ({day}) 🏆")
 print("="*40)
 
-# Sort scores High -> Low
 scores_sorted = {k: v for k, v in sorted(scores.items(), key=lambda item: item[1], reverse=True)}
-
-# Create Table
 scores_msg_df = pd.DataFrame(scores_sorted.items(), columns=['Manager', 'Points'])
 
-# Print to Console IMMEDIATELY
 print(scores_msg_df.to_markdown(index=False))
 
-# Save Text File
 leaderboard_table = f'*{day.upper()}*\n```\n{scores_msg_df.to_markdown(index=False)}\n```'
 with open(leaderboard_file, 'w') as f:
     f.write(leaderboard_table)
 
-print("\n... Generating graphs in background ...")
+print("\n... Generating graphs & reports in background ...")
 
 # ==========================================
 # 5. HISTORICAL TRACKING & LINE GRAPH
 # ==========================================
-# Load Previous Results
 if os.path.exists(prev_results_file):
     prev_scores = pd.read_csv(prev_results_file, header=None).T
     new_header = prev_scores.iloc[0]
@@ -140,20 +138,16 @@ if os.path.exists(prev_results_file):
 else:
     prev_scores_dicts = []
 
-# Append Current Scores
 current_scores_dict = prev_scores_dicts + [scores]
 graph_scores = pd.DataFrame(current_scores_dict)
 
-# Save New Results File
 graph_scores_t = graph_scores.T
 graph_scores_t = graph_scores_t.sort_values(by=graph_scores_t.columns[-1], ascending=False)
 graph_scores_t.to_csv(results_file, header=False)
 
-# Generate Line Graph
 ax = graph_scores.plot.line(marker='o')
 ax.set_ylabel("Points")
 
-# Legend Logic
 final_scores = graph_scores.iloc[-1]
 sorted_cols = final_scores.sort_values(ascending=False).index
 
@@ -164,10 +158,7 @@ if len(graph_scores) >= 2:
     prev_positions = {col: idx for idx, col in enumerate(prev_sorted)}
     curr_positions = {col: idx for idx, col in enumerate(sorted_cols)}
     for col in sorted_cols:
-        if col in prev_positions:
-            position_changes[col] = prev_positions[col] - curr_positions[col]
-        else:
-            position_changes[col] = 0
+        position_changes[col] = prev_positions.get(col, 0) - curr_positions[col]
 else:
     for col in sorted_cols: position_changes[col] = 0
 
@@ -183,34 +174,65 @@ for col in sorted_cols:
 
 plt.legend(sorted_handles, sorted_labels, bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
 plt.savefig(leaderboard_graph_file, bbox_inches="tight")
-# plt.show()  <-- DISABLED BLOCKING POPUP
+# plt.show()
 
 # ==========================================
 # 6. FEATURE: TOP 10 PLAYERS GRAPH
 # ==========================================
 print("📊 Generating 'leaderboard.png' (Top 10 Players)...")
-
 try:
     if 'mvp_df' in locals():
-        # Sort by Pts
         top_10 = mvp_df.sort_values(by='Pts', ascending=False).head(10)
-        
-        # Create Bar Chart
         plt.figure(figsize=(10, 6)) 
         plt.bar(top_10['Player'], top_10['Pts'], color='skyblue')
-        
         plt.title(f'Top 10 MVP Players ({day})')
         plt.xlabel('Player Name')
         plt.ylabel('Total Points')
         plt.xticks(rotation=45, ha='right') 
         plt.tight_layout()
-        
         plt.savefig('leaderboard.png')
-        print("✅ Success! Open 'leaderboard.png' to see the Top 10 graph.")
     else:
         print("❌ Error: mvp_df not found.")
-
 except Exception as e:
     print(f"❌ Graph Error: {e}")
+
+# ==========================================
+# 7. FEATURE: WHO OWNS WHO? (Ownership Report)
+# ==========================================
+print("🕵️  Generating 'player_ownership.csv'...")
+
+try:
+    ownership_list = []
+    # Loop through every manager's team
+    for mgr in fantasy_teams_df.columns:
+        for player in fantasy_teams_df[mgr]:
+            player_clean = str(player).strip()
+            
+            # Skip empty rows or 'nan'
+            if player_clean and player_clean != 'nan':
+                # Find points for this player
+                pts = 0
+                match = mvp_df[mvp_df['Player'] == player_clean]
+                if not match.empty:
+                    pts = float(match.iloc[0]['Pts'])
+                
+                ownership_list.append({
+                    'Player': player_clean.title(), # Capitalize name
+                    'Manager': mgr, 
+                    'Points': pts
+                })
+
+    # Create DataFrame and Save
+    ownership_df = pd.DataFrame(ownership_list)
+    # Sort by Points (descending) so best players are at top
+    ownership_df = ownership_df.sort_values(by='Points', ascending=False)
+    
+    output_path = f'./{group}/player_ownership.csv'
+    ownership_df.to_csv(output_path, index=False)
+    print(f"✅ Success! Created '{output_path}'.")
+    print("   -> Open this file to search for any player!")
+
+except Exception as e:
+    print(f"❌ Ownership Report Error: {e}")
 
 print("\n✨ Script Complete.")
