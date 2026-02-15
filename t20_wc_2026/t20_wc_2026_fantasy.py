@@ -43,7 +43,7 @@ day = 'day_' + str(day_num)
 prev_day = 'day_' + str(day_num - 1)
 print(day_num)
 
-# Change for each group
+# Change for each groupgit add t20_wc_2026_fantasy.py
 group = sys.argv[1]
 print(group)
 tournament = 't20_wc_2026'
@@ -242,3 +242,37 @@ print()
 with open(leaderboard_file, 'w') as f:
     f.write(leaderboard_table)
 
+
+# ==========================================
+# FEATURE: Generate Top 10 Graph (Image)
+# ==========================================
+print("\n📊 Generating 'leaderboard.png'...")
+
+try:
+    # 1. Use the correct variable name from your script (mvp_df)
+    if 'mvp_df' in locals():
+        data = mvp_df
+        
+        # 2. Sort and slice top 10 (using 'Pts' column)
+        top_10 = data.sort_values(by='Pts', ascending=False).head(10)
+        
+        # 3. Create the Bar Chart
+        plt.figure(figsize=(10, 6)) 
+        plt.bar(top_10['Player'], top_10['Pts'], color='skyblue')
+        
+        # 4. Make it pretty
+        plt.title(f'Top 10 MVP Players ({day})')
+        plt.xlabel('Player Name')
+        plt.ylabel('Total Points')
+        plt.xticks(rotation=45, ha='right') 
+        plt.tight_layout()
+        
+        # 5. Save the file
+        plt.savefig('leaderboard.png')
+        print("✅ Success! Open 'leaderboard.png' to see the graph.")
+        
+    else:
+        print("❌ Error: Could not find 'mvp_df'. Did the CSV load correctly?")
+
+except Exception as e:
+    print(f"❌ Graph Error: {e}")
