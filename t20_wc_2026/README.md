@@ -1,5 +1,5 @@
 # 🏏 T20 World Cup 2026 Fantasy League
-📅 **Tournament Day:** DAY 8 | 🕒 **Last Update:** 2026-02-15 16:41:25
+📅 **Tournament Day:** DAY 8 | 🕒 **Last Update:** 2026-02-15 16:51:07
 
 ### 🏆 Current Standings
 | Manager      |   Total Points |
