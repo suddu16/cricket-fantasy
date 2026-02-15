@@ -58,11 +58,6 @@
             <span class="tab-icon">👤</span> Group 1 Players
         </a>
     </li>
-    <li class="nav-item" role="presentation">
-        <a class="nav-link" data-bs-toggle="tab" href="#group_2" role="tab">
-            <span class="tab-icon">🏏</span> Group 2 Standings
-        </a>
-    </li>
 </ul>
 
     <!-- Tab Contents -->
@@ -114,28 +109,6 @@
     <p id="group_1PlayerMessage"></p>
     <div id="group_1PlayerTable"></div>
 </div>
-
-        <div id="group_2" class="tab-pane fade">
-            <h2>Group 2</h2>
-            <select id="group_2Selector" class="form-select" onchange="loadCSV('group_2')"></select>
-            <p id="group_2Message" class="mt-2"></p>
-            <div class="mb-4 row">
-                <div class="col-md-9">
-                    <canvas id="group_2Chart" style="height: 600px;"></canvas>
-                </div>
-                <div class="col-md-3">
-                    <div id="group_2Rankings" class="card" style="height: 600px;">
-                        <div class="card-header bg-primary text-white">
-                            <strong>Current Rankings</strong>
-                        </div>
-                        <div class="card-body p-2" style="overflow-y: auto;">
-                            <div id="group_2RankingsList"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div id="group_2Table"></div>
-        </div>
 
     </div>
 </div>

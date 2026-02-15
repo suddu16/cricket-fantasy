@@ -1,4 +1,4 @@
-const folders = ["data", "group_1", "group_2"];
+const folders = ["data", "group_1"];
 const maxDays = 31;
 const mainlineBranch = `https://raw.githubusercontent.com/suddu16/cricket-fantasy/main`;
 const tournament = `t20_wc_2026`
@@ -82,13 +82,8 @@ async function loadCSV(folder) {
         filename = select.value;
         messageDiv = document.getElementById("group_1PlayerMessage");
         tableDiv = document.getElementById("group_1PlayerTable");
-    } else if (folder === "group_2Players") {
-        select = document.getElementById("group_2PlayersSelector");
-        filename = select.value;
-        messageDiv = document.getElementById("group_2PlayerMessage");
-        tableDiv = document.getElementById("group_2PlayerTable");
     } else {
-        // Set up other tabs (data, group_1, group_2)
+        // Set up other tabs (data, group_1)
         select = document.getElementById(`${folder}Selector`);
         filename = select.value;
         messageDiv = document.getElementById(`${folder}Message`);
@@ -137,7 +132,7 @@ async function loadCSV(folder) {
                 th.textContent = field;
                 headerRow.appendChild(th);
             });
-        } else if (folder === "group_1Players" || folder === "group_2Players") {
+        } else if (folder === "group_1Players") {
             // For player groups, use the first row as header, and reverse columns for days
             const totalDays = rows[0].length - 1;
             headerRow.appendChild(createHeaderCell("Player")); // First column remains "Player"
@@ -145,7 +140,7 @@ async function loadCSV(folder) {
                 headerRow.appendChild(createHeaderCell(rows[0][day])); // Use actual day names from CSV
             }
         } else {
-            // Other groups (group_1, group_2) - Display players as rows, days as columns (reversed)
+            // Other groups (group_1) - Display players as rows, days as columns (reversed)
             headerRow.appendChild(createHeaderCell("Player"));
             
             // The table body renders: row[0], then row[length-1] down to row[1]
@@ -166,7 +161,7 @@ async function loadCSV(folder) {
         // Table body
         const tbody = document.createElement("tbody");
         var startIndex = 1
-        if (folder == "group_1" || folder == "group_2") {
+        if (folder == "group_1") {
             startIndex = 0
         }
         rows.slice(startIndex).forEach(row => {
@@ -177,7 +172,7 @@ async function loadCSV(folder) {
                 row.forEach(cell => {
                     tr.appendChild(createCell(cell));
                 });
-            } else if (folder === "group_1Players" || folder === "group_2Players") {
+            } else if (folder === "group_1Players") {
                 // For player groups, reverse the order and highlight changes
                 tr.appendChild(createCell(row[0])); // Player name first
                 
@@ -225,7 +220,7 @@ async function loadCSV(folder) {
                     tr.appendChild(cell);
                 }
             } else {
-                // For group_1 and group_2, reverse the order for days
+                // For group_1, reverse the order for days
                 tr.appendChild(createCell(row[0])); // Player name first
                 for (let i = row.length - 1; i > 0; i--) {
                     tr.appendChild(createCell(row[i]));
@@ -238,7 +233,7 @@ async function loadCSV(folder) {
         table.appendChild(tbody);
 
         // Add total row for player groups showing daily points gained
-        if (folder === "group_1Players" || folder === "group_2Players") {
+        if (folder === "group_1Players") {
             const tfoot = document.createElement("tfoot");
             const totalRow = document.createElement("tr");
             totalRow.style.fontWeight = "bold";
@@ -281,7 +276,7 @@ async function loadCSV(folder) {
         messageDiv.textContent = "";
 
         // Create chart for group_1 if applicable
-        if (folder === "group_1" || folder === "group_2") {
+        if (folder === "group_1") {
             await createProgressionChart(folder, rows);
             await displayDailyPointsAndTopScorer(folder, rows);
         }
@@ -299,7 +294,7 @@ async function loadCSV(folder) {
                 order: [[2, "desc"]] 
             });
         } else {
-            // For group_1 and group_2, sort by the last column
+            // For group_1, sort by the last column
             $(table).DataTable({
                 searching: true,  
                 pageLength: 20,
@@ -345,7 +340,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             tab.show();
             
             // Load data for the activated tab if not already loaded
-            if (tabParam === 'group_1' || tabParam === 'group_2') {
+            if (tabParam === 'group_1') {
                 loadCSV(tabParam);
             }
         }
@@ -778,6 +773,51 @@ async function displayDailyPointsAndTopScorer(folder, currentDayData) {
             }
         }
         
+        // Calculate position changes between current day and previous day
+        let maxPositionGain = 0;
+        let biggestClimber = [];
+        
+        // Get rankings for current day
+        const currentDayRankings = [];
+        for (let row = 0; row < currentDayData.length; row++) {
+            const playerRow = currentDayData[row];
+            if (playerRow.length <= currentDayColIndex) continue;
+            
+            const playerName = playerRow[0];
+            const points = parseFloat(playerRow[currentDayColIndex]) || 0;
+            currentDayRankings.push({ name: playerName, points: points });
+        }
+        currentDayRankings.sort((a, b) => b.points - a.points);
+        
+        // Get rankings for previous day
+        const prevDayRankings = [];
+        for (let row = 0; row < currentDayData.length; row++) {
+            const playerRow = currentDayData[row];
+            if (playerRow.length <= prevDayColIndex) continue;
+            
+            const playerName = playerRow[0];
+            const points = parseFloat(playerRow[prevDayColIndex]) || 0;
+            prevDayRankings.push({ name: playerName, points: points });
+        }
+        prevDayRankings.sort((a, b) => b.points - a.points);
+        
+        // Calculate position changes
+        for (let i = 0; i < currentDayRankings.length; i++) {
+            const playerName = currentDayRankings[i].name;
+            const currentPos = i + 1;
+            const prevPos = prevDayRankings.findIndex(p => p.name === playerName) + 1;
+            const positionGain = prevPos - currentPos; // Positive means moved up
+            
+            if (positionGain > maxPositionGain) {
+                maxPositionGain = positionGain;
+                biggestClimber = [playerName];
+            } else if (positionGain === maxPositionGain && positionGain > 0) {
+                biggestClimber.push(playerName);
+            }
+        }
+        
+        console.log('Biggest Climber:', biggestClimber, 'gained', maxPositionGain, 'positions');
+        
         // Iterate through each player (each row)
         for (let row = 0; row < currentDayData.length; row++) {
             const playerRow = currentDayData[row];
@@ -845,7 +885,7 @@ async function displayDailyPointsAndTopScorer(folder, currentDayData) {
         
         // Most days at #1 card
         const mostDaysCard = document.createElement('div');
-        mostDaysCard.className = 'col-md-4';
+        mostDaysCard.className = 'col-md-3';
         
         let daysText = mostDaysAtRank1 === 1 ? '1 day' : `${mostDaysAtRank1} days`;
         
@@ -861,9 +901,28 @@ async function displayDailyPointsAndTopScorer(folder, currentDayData) {
             </div>
         `;
         
+        // Biggest climber card
+        const biggestClimberCard = document.createElement('div');
+        biggestClimberCard.className = 'col-md-3';
+        
+        let positionText = maxPositionGain === 1 ? '1 position' : `${maxPositionGain} positions`;
+        
+        biggestClimberCard.innerHTML = `
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <strong>📈 Biggest Climber</strong>
+                </div>
+                <div class="card-body text-center">
+                    <h3 class="text-success">${biggestClimber.join(', ')}</h3>
+                    <h4>+${positionText}</h4>
+                    <p class="mb-0 text-muted">on Day ${currentDay}</p>
+                </div>
+            </div>
+        `;
+        
         // Best single day performance card
         const topScorerCard = document.createElement('div');
-        topScorerCard.className = 'col-md-4';
+        topScorerCard.className = 'col-md-3';
         
         // Format the duration text
         let durationText = '';
@@ -891,7 +950,7 @@ async function displayDailyPointsAndTopScorer(folder, currentDayData) {
         
         // Daily points table card
         const dailyPointsCard = document.createElement('div');
-        dailyPointsCard.className = 'col-md-4';
+        dailyPointsCard.className = 'col-md-3';
         
         let dailyPointsHTML = `
             <div class="card">
@@ -932,6 +991,7 @@ async function displayDailyPointsAndTopScorer(folder, currentDayData) {
         
         // Add cards to container
         statsContainer.appendChild(mostDaysCard);
+        statsContainer.appendChild(biggestClimberCard);
         statsContainer.appendChild(topScorerCard);
         statsContainer.appendChild(dailyPointsCard);
         
