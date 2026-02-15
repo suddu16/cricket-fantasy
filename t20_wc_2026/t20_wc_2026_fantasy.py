@@ -52,7 +52,69 @@ for mgr in fantasy_mgrs:
 scores_df = pd.DataFrame(list(scores.items()), columns=['Manager', 'Pts']).sort_values(by='Pts', ascending=False)
 
 # ==========================================
-# 3. GENERATE ANIMATED PROGRESSION (MOVING GRAPH)
+# 3. WRITE MANAGER CSV FILES & RESULTS
+# ==========================================
+print("📝 Writing manager CSV files and results...")
+
+# Load or create manager CSV files with cumulative points per player
+for mgr in fantasy_mgrs:
+    mgr_file = f'./{group}/{mgr}.csv'
+    mgr_players = fantasy_teams_df[mgr].dropna().astype(str).str.lower().str.strip().tolist()
+    
+    # Load existing file or create new one
+    if os.path.exists(mgr_file):
+        mgr_df = pd.read_csv(mgr_file, index_col=0)
+    else:
+        # Create new dataframe with player names as index
+        mgr_df = pd.DataFrame(index=[p for p in mgr_players])
+        mgr_df.index.name = mgr
+    
+    # Ensure day_0 column exists (add it if missing)
+    if 'day_0' not in mgr_df.columns:
+        mgr_df.insert(0, 'day_0', 0.0)
+    
+    # Add current day column if it doesn't exist
+    if day not in mgr_df.columns:
+        mgr_df[day] = 0.0
+    
+    # Update points for each player
+    for player in mgr_players:
+        player_pts = mvp_df[mvp_df['Player'] == player]['Pts'].sum()
+        mgr_df.loc[player, day] = round(player_pts, 2)
+    
+    # Save the file
+    mgr_df.to_csv(mgr_file)
+
+# Write results file (cumulative points per manager per day)
+results_file = f'./{group}/t20_wc_2026_results_{day}.csv'
+
+# Load all previous days to build cumulative results
+all_days = sorted([f for f in os.listdir('./data/') if f.startswith('mvp_day_')], 
+                  key=lambda x: int(x.split('_')[2].split('.')[0]))
+
+results_data = []
+for mgr in fantasy_mgrs:
+    mgr_row = [mgr, 0.0]  # Start with manager name and day_0 = 0.0
+    mgr_players = fantasy_teams_df[mgr].dropna().astype(str).str.lower().str.strip().tolist()
+    
+    # Calculate cumulative points for each day
+    for d_file in all_days:
+        d_name = d_file.replace('mvp_', '').replace('.csv', '')
+        temp_df = pd.read_csv(f'./data/{d_file}')
+        temp_df['Player'] = temp_df['Player'].astype(str).str.lower().str.strip()
+        day_pts = temp_df[temp_df['Player'].isin(mgr_players)]['Pts'].sum()
+        mgr_row.append(round(day_pts, 2))
+    
+    results_data.append(mgr_row)
+
+# Create results dataframe without header row
+results_df = pd.DataFrame(results_data)
+results_df.to_csv(results_file, index=False, header=False)
+
+print(f"✅ Written {len(fantasy_mgrs)} manager files and {results_file}")
+
+# ==========================================
+# 4. GENERATE ANIMATED PROGRESSION (MOVING GRAPH)
 # ==========================================
 print("🎬 Creating animated race...")
 plt.style.use('dark_background')
@@ -66,6 +128,7 @@ for d_file in days_files:
     temp_df = pd.read_csv(f'./data/{d_file}')
     temp_df['Player'] = temp_df['Player'].astype(str).str.lower().str.strip()
     for mgr in fantasy_mgrs:
+        mgr_file = f'./{group}/{mgr}.csv'
         mgr_players = fantasy_teams_df[mgr].dropna().astype(str).str.lower().str.strip().tolist()
         pts = temp_df[temp_df['Player'].isin(mgr_players)]['Pts'].sum()
         history_data[mgr].append(pts)
@@ -86,7 +149,7 @@ ani.save(f'./{group}/points_progression.gif', writer='pillow')
 plt.close()
 
 # ==========================================
-# 4. GENERATE PIE CHART (TRANSPARENT)
+# 5. GENERATE PIE CHART (TRANSPARENT)
 # ==========================================
 plt.figure(figsize=(6, 6))
 plt.pie(scores_df['Pts'], labels=scores_df['Manager'], autopct='%1.1f%%', colors=plt.cm.Paired.colors)
@@ -94,7 +157,7 @@ plt.savefig(f'./{group}/manager_distribution.png', transparent=True)
 plt.close()
 
 # ==========================================
-# 5. WEB INJECTION & GROUP 2 REMOVAL
+# 6. WEB INJECTION & GROUP 2 REMOVAL
 # ==========================================
 print("🏗️ Updating index.html UI...")
 
