@@ -1,94 +1,552 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f9fa;
-    margin: 0;
-    padding: 20px;
-    text-align: center;
+/* Cricket Theme - T20 World Cup 2026 Fantasy */
+
+:root {
+    --cricket-primary: #03a9f4;
+    --cricket-secondary: #0288d1;
+    --cricket-dark: #01579b;
+    --cricket-light: #b3e5fc;
+    --cricket-green: #4caf50;
+    --cricket-pitch: #8bc34a;
+    --cricket-boundary: #ff9800;
+    --cricket-wicket: #f44336;
+    --cricket-gold: #ffc107;
+    --cricket-silver: #9e9e9e;
+    --cricket-bronze: #cd7f32;
+    --cricket-bg: #f5f5f5;
+    --cricket-card-bg: #ffffff;
+    --world-cup-blue: #1565c0;
+    --world-cup-gradient: linear-gradient(135deg, #1565c0 0%, #03a9f4 50%, #00bcd4 100%);
 }
 
-h1 {
-    color: #007bff;
+body.cricket-theme {
+    background: linear-gradient(135deg, #e3f2fd 0%, #f5f5f5 50%, #e8f5e9 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    position: relative;
 }
 
-.tabs {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-bottom: 20px;
+/* Cricket Field Background Pattern */
+body.cricket-theme::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(3, 169, 244, 0.02) 50px, rgba(3, 169, 244, 0.02) 100px);
+    pointer-events: none;
+    z-index: 0;
 }
 
-.tab-button {
-    padding: 10px 20px;
-    margin: 5px;
-    border: none;
-    background-color: #007bff;
+.container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Header Styling */
+.cricket-header {
+    background: var(--world-cup-gradient);
     color: white;
-    cursor: pointer;
-    border-radius: 5px;
+    padding: 2.5rem 0;
+    margin-bottom: 2rem;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    border-bottom: 5px solid var(--cricket-gold);
+    position: relative;
+    overflow: hidden;
 }
 
-.tab-button:hover {
-    background-color: #0056b3;
+.cricket-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
 }
 
-.tab {
-    display: none;
-    padding: 20px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+.cricket-header::after {
+    content: '';
+    position: absolute;
+    bottom: -50%;
+    left: -10%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
 }
 
-.tab.active {
+.header-content {
+    position: relative;
+    z-index: 2;
+}
+
+.tournament-badge {
+    text-align: center;
+    margin-bottom: 0.5rem;
+    animation: fadeInDown 1s ease;
+}
+
+.trophy-icon {
+    font-size: 2.5rem;
+    display: inline-block;
+    animation: rotate 3s ease-in-out infinite;
+}
+
+@keyframes rotate {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+}
+
+.tournament-year {
     display: block;
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 3px;
+    margin-top: 0.5rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-select {
-    padding: 10px;
-    margin: 10px;
-    border-radius: 5px;
+.cricket-title {
+    font-size: 2.8rem;
+    font-weight: bold;
+    margin: 0.5rem 0;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 1.5s ease;
 }
 
-table {
-    width: 80%;
-    margin: 20px auto;
-    border-collapse: collapse;
+.cricket-icon {
+    font-size: 2.2rem;
+    animation: bounce 2s infinite;
+    display: inline-block;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.cricket-subtitle {
+    font-size: 1.2rem;
+    margin-top: 0.5rem;
+    opacity: 0.95;
+    font-weight: 400;
+    letter-spacing: 1px;
+    animation: fadeIn 2s ease;
+}
+
+.pulse-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--cricket-gold);
+    border-radius: 50%;
+    margin: 0 0.5rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+/* Tabs Styling */
+.cricket-tabs {
     background: white;
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: none;
+    padding: 0.75rem 0.75rem 0 0.75rem;
 }
 
-th, td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: center;
+.cricket-tabs .nav-link {
+    color: var(--cricket-dark);
+    border: none;
+    border-radius: 10px 10px 0 0;
+    padding: 1rem 1.75rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-right: 0.5rem;
+    position: relative;
+    overflow: hidden;
 }
 
-th {
-    background-color: #007bff;
+.cricket-tabs .nav-link::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--cricket-primary);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.cricket-tabs .nav-link:hover {
+    background: var(--cricket-light);
+    color: var(--cricket-dark);
+    transform: translateY(-2px);
+}
+
+.cricket-tabs .nav-link:hover::before {
+    transform: scaleX(1);
+}
+
+.cricket-tabs .nav-link.active {
+    background: var(--world-cup-gradient);
     color: white;
+    border: none;
+    box-shadow: 0 -4px 12px rgba(3, 169, 244, 0.4);
 }
 
-tfoot td {
+.cricket-tabs .nav-link.active::before {
+    display: none;
+}
+
+.tab-icon {
+    margin-right: 0.5rem;
+    font-size: 1.1rem;
+}
+
+/* Tab Content */
+.tab-content {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Controls */
+.form-select {
+    border: 2px solid var(--cricket-light);
+    border-radius: 10px;
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: #fafafa;
+}
+
+.form-select:focus {
+    border-color: var(--cricket-primary);
+    box-shadow: 0 0 0 0.25rem rgba(3, 169, 244, 0.25);
+    background-color: white;
+}
+
+/* Cards */
+.card {
+    border-radius: 15px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    border-radius: 15px 15px 0 0 !important;
+    font-weight: 700;
+    padding: 1.25rem 1.5rem;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+}
+
+/* Stats Cards */
+.border-primary {
+    border: 4px solid var(--cricket-primary) !important;
+}
+
+.border-warning {
+    border: 4px solid var(--cricket-gold) !important;
+}
+
+.border-info {
+    border: 4px solid var(--cricket-light) !important;
+}
+
+.bg-primary {
+    background: linear-gradient(135deg, var(--cricket-primary) 0%, var(--cricket-secondary) 100%) !important;
+}
+
+.bg-warning {
+    background: linear-gradient(135deg, var(--cricket-gold) 0%, #ffb300 100%) !important;
+}
+
+.bg-info {
+    background: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%) !important;
+}
+
+/* Tables */
+.table {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table thead {
+    display: table-header-group !important;
+    visibility: visible !important;
+}
+
+.table thead th {
+    background: var(--world-cup-gradient);
+    color: white;
+    border: none;
+    padding: 1.25rem 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    display: table-cell !important;
+    visibility: visible !important;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(3, 169, 244, 0.04);
+}
+
+.table tbody tr {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.table tbody tr:hover {
+    background-color: rgba(3, 169, 244, 0.12);
+    transform: scale(1.01);
+}
+
+.table td {
+    padding: 1rem;
+    vertical-align: middle;
+    font-size: 0.95rem;
+}
+
+/* Table Footer */
+.table tfoot tr {
+    background: linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%);
     font-weight: bold;
-    background: #f0f0f0;
+    border-top: 4px solid var(--cricket-primary);
 }
 
-/* Highlight cells where points changed from previous day */
+.table tfoot td {
+    padding: 1.25rem 1rem;
+    font-size: 1rem;
+}
+
+/* Highlighted Cells */
 .points-increased {
-    background-color: #90EE90 !important; /* Light green for increases */
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-}
-
-.points-increased:hover {
-    background-color: #7FD87F !important; /* Slightly darker green on hover */
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.25) 0%, rgba(76, 175, 80, 0.15) 100%) !important;
+    color: #2e7d32;
+    font-weight: 600;
+    border-left: 3px solid var(--cricket-green);
 }
 
 .points-decreased {
-    background-color: #FFB6C6 !important; /* Light red/pink for decreases */
-    font-weight: bold;
-    transition: background-color 0.3s ease;
+    background: linear-gradient(135deg, rgba(244, 67, 54, 0.25) 0%, rgba(244, 67, 54, 0.15) 100%) !important;
+    color: #c62828;
+    font-weight: 600;
+    border-left: 3px solid var(--cricket-wicket);
 }
 
-.points-decreased:hover {
-    background-color: #FFA0B4 !important; /* Slightly darker red on hover */
+/* Badges */
+.badge {
+    padding: 0.6rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    border-radius: 25px;
+    letter-spacing: 0.5px;
+}
+
+.badge.bg-success {
+    background: linear-gradient(135deg, var(--cricket-green) 0%, #66bb6a 100%) !important;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.badge.bg-info {
+    background: linear-gradient(135deg, var(--cricket-primary) 0%, var(--cricket-secondary) 100%) !important;
+    box-shadow: 0 2px 8px rgba(3, 169, 244, 0.3);
+}
+
+/* Rankings Display */
+#group_1Rankings, #group_2Rankings {
+    border: 3px solid var(--cricket-primary);
+    border-radius: 15px;
+}
+
+#group_1RankingsList > div, #group_2RankingsList > div {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+}
+
+#group_1RankingsList > div:hover, #group_2RankingsList > div:hover {
+    background-color: rgba(3, 169, 244, 0.15);
+    transform: translateX(8px);
+}
+
+/* Chart Container */
+canvas {
+    border-radius: 12px;
+}
+
+/* DataTables Customization */
+.dataTables_wrapper .dataTables_length select,
+.dataTables_wrapper .dataTables_filter input {
+    border: 2px solid var(--cricket-light);
+    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: var(--world-cup-gradient) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: var(--cricket-light) !important;
+    color: var(--cricket-dark) !important;
+    border: none !important;
+}
+
+/* DataTables Header Fix */
+table.dataTable thead th,
+table.dataTable thead td {
+    background: var(--world-cup-gradient) !important;
+    color: white !important;
+    border: none !important;
+}
+
+/* Force text to be visible in all sorting states */
+table.dataTable > thead > tr > th,
+table.dataTable > thead > tr > td {
+    color: white !important;
+}
+
+/* Style the sorting arrows to be white */
+table.dataTable thead > tr > th.sorting:before,
+table.dataTable thead > tr > th.sorting_asc:before,
+table.dataTable thead > tr > th.sorting_desc:before,
+table.dataTable thead > tr > th.sorting:after,
+table.dataTable thead > tr > th.sorting_asc:after,
+table.dataTable thead > tr > th.sorting_desc:after {
+    color: white !important;
+    opacity: 0.7;
+}
+
+table.dataTable thead > tr > th.sorting_asc:after,
+table.dataTable thead > tr > th.sorting_desc:after {
+    opacity: 1 !important;
+}
+
+table.dataTable.no-footer {
+    border-bottom: none;
+}
+
+/* DataTables Search and Controls */
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+    color: var(--cricket-dark);
+    margin-bottom: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .cricket-title {
+        font-size: 1.8rem;
+    }
+    
+    .tournament-year {
+        font-size: 1.2rem;
+    }
+    
+    .cricket-subtitle {
+        font-size: 0.95rem;
+    }
+    
+    .cricket-tabs .nav-link {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .tab-content {
+        padding: 1.5rem;
+    }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--world-cup-gradient);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--cricket-secondary);
+}
+
+/* Text Colors */
+.text-primary {
+    color: var(--cricket-primary) !important;
+}
+
+.text-warning {
+    color: var(--cricket-gold) !important;
+}
+
+/* Additional Cricket Elements */
+.cricket-ball {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle, #e53935 0%, #c62828 100%);
+    border-radius: 50%;
+    box-shadow: inset -2px -2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.cricket-bat {
+    color: #8d6e63;
+    font-size: 1.2rem;
+}
+
+/* Loading State */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(3, 169, 244, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--cricket-primary);
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
