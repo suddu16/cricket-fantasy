@@ -277,6 +277,13 @@ async function loadCSV(folder) {
 
         // Create chart for group_1 if applicable
         if (folder === "group_1") {
+            // Set the animated GIF source
+            const gifElement = document.getElementById('group_1ProgressionGif');
+            if (gifElement) {
+                const timestamp = new Date().getTime(); // Cache buster
+                gifElement.src = `${mainlineBranch}/${tournament}/${folder}/points_progression.gif?v=${timestamp}`;
+            }
+            
             await createProgressionChart(folder, rows);
             await displayDailyPointsAndTopScorer(folder, rows);
         }
@@ -880,17 +887,21 @@ async function displayDailyPointsAndTopScorer(folder, currentDayData) {
         
         // Create container for daily stats
         const statsContainer = document.createElement('div');
-        statsContainer.className = 'row mt-4 mb-4';
+        statsContainer.className = 'mt-4 mb-4';
         statsContainer.id = `${folder}DailyStats`;
+        
+        // First row with 3 stat cards
+        const firstRow = document.createElement('div');
+        firstRow.className = 'row mb-3';
         
         // Most days at #1 card
         const mostDaysCard = document.createElement('div');
-        mostDaysCard.className = 'col-md-3';
+        mostDaysCard.className = 'col-lg-4 col-md-6 mb-3 mb-lg-0';
         
         let daysText = mostDaysAtRank1 === 1 ? '1 day' : `${mostDaysAtRank1} days`;
         
         mostDaysCard.innerHTML = `
-            <div class="card border-primary">
+            <div class="card border-primary h-100">
                 <div class="card-header bg-primary text-white">
                     <strong>👑 Most Days at #1</strong>
                     <span class="badge bg-light text-primary float-end">JENDA</span>
@@ -904,12 +915,12 @@ async function displayDailyPointsAndTopScorer(folder, currentDayData) {
         
         // Biggest climber card
         const biggestClimberCard = document.createElement('div');
-        biggestClimberCard.className = 'col-md-3';
+        biggestClimberCard.className = 'col-lg-4 col-md-6 mb-3 mb-lg-0';
         
         let positionText = maxPositionGain === 1 ? '1 position' : `${maxPositionGain} positions`;
         
         biggestClimberCard.innerHTML = `
-            <div class="card border-success">
+            <div class="card border-success h-100">
                 <div class="card-header bg-success text-white">
                     <strong>📈 Biggest Climber</strong>
                     <span class="badge bg-light text-success float-end">JENDA</span>
@@ -924,7 +935,7 @@ async function displayDailyPointsAndTopScorer(folder, currentDayData) {
         
         // Best single day performance card
         const topScorerCard = document.createElement('div');
-        topScorerCard.className = 'col-md-3';
+        topScorerCard.className = 'col-lg-4 col-md-12 mb-3 mb-lg-0';
         
         // Format the duration text
         let durationText = '';
@@ -937,7 +948,7 @@ async function displayDailyPointsAndTopScorer(folder, currentDayData) {
         }
         
         topScorerCard.innerHTML = `
-            <div class="card border-warning">
+            <div class="card border-warning h-100">
                 <div class="card-header bg-warning text-dark">
                     <strong>🏆 Best Single Day Performance</strong>
                     <span class="badge bg-light text-dark float-end">JENDA</span>
@@ -951,9 +962,18 @@ async function displayDailyPointsAndTopScorer(folder, currentDayData) {
             </div>
         `;
         
+        // Add cards to first row
+        firstRow.appendChild(mostDaysCard);
+        firstRow.appendChild(biggestClimberCard);
+        firstRow.appendChild(topScorerCard);
+        
+        // Second row with daily points table (full width)
+        const secondRow = document.createElement('div');
+        secondRow.className = 'row';
+        
         // Daily points table card
         const dailyPointsCard = document.createElement('div');
-        dailyPointsCard.className = 'col-md-3';
+        dailyPointsCard.className = 'col-12';
         
         let dailyPointsHTML = `
             <div class="card">
@@ -962,15 +982,16 @@ async function displayDailyPointsAndTopScorer(folder, currentDayData) {
                     <span class="badge bg-light text-info float-end">JENDA</span>
                 </div>
                 <div class="card-body">
-                    <table class="table table-sm table-hover">
-                        <thead>
-                            <tr>
-                                <th>Rank</th>
-                                <th>Player</th>
-                                <th>Points</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Player</th>
+                                    <th>Points</th>
+                                </tr>
+                            </thead>
+                            <tbody>
         `;
         
         dailyPoints.forEach((player, idx) => {
@@ -985,19 +1006,21 @@ async function displayDailyPointsAndTopScorer(folder, currentDayData) {
         });
         
         dailyPointsHTML += `
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         `;
         
         dailyPointsCard.innerHTML = dailyPointsHTML;
         
-        // Add cards to container
-        statsContainer.appendChild(mostDaysCard);
-        statsContainer.appendChild(biggestClimberCard);
-        statsContainer.appendChild(topScorerCard);
-        statsContainer.appendChild(dailyPointsCard);
+        // Add daily points card to second row
+        secondRow.appendChild(dailyPointsCard);
+        
+        // Add both rows to container
+        statsContainer.appendChild(firstRow);
+        statsContainer.appendChild(secondRow);
         
         // Insert before the table
         tableDiv.parentNode.insertBefore(statsContainer, tableDiv);
