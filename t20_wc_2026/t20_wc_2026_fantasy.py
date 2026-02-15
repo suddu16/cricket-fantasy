@@ -130,3 +130,16 @@ try:
 
 except Exception as e:
     print(f"❌ Web Sync Error: {e}")
+
+# ==========================================
+# 8. SQUAD & OWNERSHIP VIEW FOR THE WEBSITE
+# ==========================================
+print("🌐 Formatting squads for web view...")
+with open(f"./{group}/squads_live.md", "w") as f:
+    f.write("# 🏏 Official Player Ownership & Squads\n\n")
+    for mgr in fantasy_mgrs:
+        f.write(f"### 🛡️ {mgr.upper()}'S SQUAD\n")
+        # Filter ownership list for this manager
+        mgr_players = [p for p in ownership_list if p['Manager'] == mgr]
+        mgr_df = pd.DataFrame(mgr_players)[['Player', 'Points']]
+        f.write(mgr_df.to_markdown(index=False) + "\n\n")
