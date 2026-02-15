@@ -143,3 +143,43 @@ with open(f"./{group}/squads_live.md", "w") as f:
         mgr_players = [p for p in ownership_list if p['Manager'] == mgr]
         mgr_df = pd.DataFrame(mgr_players)[['Player', 'Points']]
         f.write(mgr_df.to_markdown(index=False) + "\n\n")
+
+# ==========================================
+# 9. WEBSITE INTEGRATION (The "Live" Site)
+# ==========================================
+print("🌐 Formatting data for the web interface...")
+
+try:
+    web_rows = []
+    # Using the correct variable name: fantasy_teams_df
+    for mgr in fantasy_teams_df.columns:
+        for player in fantasy_teams_df[mgr]:
+            p_name = str(player).strip().lower()
+            if p_name != 'nan' and p_name != '':
+                pts = 0.0
+                # Match points from your mvp_df
+                if p_name in mvp_df['Player'].values:
+                    pts = float(mvp_df.loc[mvp_df['Player'] == p_name, 'Pts'].iloc[0])
+                
+                web_rows.append({
+                    "Manager": mgr.upper(),
+                    "Player": p_name.title(),
+                    "Points": pts
+                })
+
+    # Create the DataFrame
+    web_output_df = pd.DataFrame(web_rows).sort_values(by="Points", ascending=False)
+
+    # 1. Save as CSV (for the site's data folder)
+    web_output_df.to_csv(f'./{group}/squads_live.csv', index=False)
+
+    # 2. Save as HTML (This is what actually shows up on a website!)
+    # We will save this as 'ownership.html'
+    html_table = web_output_df.to_html(classes='table table-striped', index=False)
+    with open(f"./{group}/ownership.html", "w") as f:
+        f.write(html_table)
+
+    print(f"✅ Website data ready in ./{group}/squads_live.csv and ownership.html")
+
+except Exception as e:
+    print(f"❌ Web Sync Error: {e}")
