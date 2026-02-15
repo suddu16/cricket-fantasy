@@ -893,6 +893,7 @@ async function displayDailyPointsAndTopScorer(folder, currentDayData) {
             <div class="card border-primary">
                 <div class="card-header bg-primary text-white">
                     <strong>👑 Most Days at #1</strong>
+                    <span class="badge bg-light text-primary float-end">JENDA</span>
                 </div>
                 <div class="card-body text-center">
                     <h3 class="text-primary">${mostDaysLeader.join(', ')}</h3>
@@ -911,6 +912,7 @@ async function displayDailyPointsAndTopScorer(folder, currentDayData) {
             <div class="card border-success">
                 <div class="card-header bg-success text-white">
                     <strong>📈 Biggest Climber</strong>
+                    <span class="badge bg-light text-success float-end">JENDA</span>
                 </div>
                 <div class="card-body text-center">
                     <h3 class="text-success">${biggestClimber.join(', ')}</h3>
@@ -938,6 +940,7 @@ async function displayDailyPointsAndTopScorer(folder, currentDayData) {
             <div class="card border-warning">
                 <div class="card-header bg-warning text-dark">
                     <strong>🏆 Best Single Day Performance</strong>
+                    <span class="badge bg-light text-dark float-end">JENDA</span>
                 </div>
                 <div class="card-body text-center">
                     <h3 class="text-warning">${bestSingleDayPlayer.join(', ')}</h3>
@@ -956,6 +959,7 @@ async function displayDailyPointsAndTopScorer(folder, currentDayData) {
             <div class="card">
                 <div class="card-header bg-info text-white">
                     <strong>📊 Points Scored on Day ${currentDay}</strong>
+                    <span class="badge bg-light text-info float-end">JENDA</span>
                 </div>
                 <div class="card-body">
                     <table class="table table-sm table-hover">
