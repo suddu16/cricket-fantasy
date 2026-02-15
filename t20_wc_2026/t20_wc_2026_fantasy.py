@@ -95,3 +95,38 @@ plt.tight_layout()
 plt.savefig('leaderboard.png')
 
 print(f"✅ Site Updated! Just push to see it live.")
+
+# ==========================================
+# 7. WEB INTEGRATION: WHO OWNS WHO
+# ==========================================
+print("🌐 Syncing Ownership Data to Website...")
+
+try:
+    ownership_list = []
+    for mgr in fantasy_teams_df.columns:
+        for player in fantasy_teams_df[mgr]:
+            player_clean = str(player).strip()
+            if player_clean and player_clean != 'nan':
+                pts = 0
+                match = mvp_df[mvp_df['Player'] == player_clean]
+                if not match.empty:
+                    pts = float(match.iloc[0]['Pts'])
+                
+                ownership_list.append({
+                    'Player': player_clean.title(),
+                    'Manager': mgr, 
+                    'Points': pts
+                })
+
+    ownership_df = pd.DataFrame(ownership_list)
+    # Sort by points so the website shows the best players first
+    ownership_df = ownership_df.sort_values(by='Points', ascending=False)
+    
+    # SAVE THIS SPECIFIC FILENAME - the website template looks for this
+    site_file_path = f'./{group}/player_ownership_web.csv'
+    ownership_df.to_csv(site_file_path, index=False)
+    
+    print(f"✅ Web data synced to {site_file_path}")
+
+except Exception as e:
+    print(f"❌ Web Sync Error: {e}")
