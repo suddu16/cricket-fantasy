@@ -5,6 +5,7 @@
 
 
 import pandas as pd
+import os
 from pprint import pprint
 from bs4 import BeautifulSoup
 import io
@@ -103,6 +104,36 @@ mvp_df['Player Short Name'] = mvp_df['Player Short Name'].str.lower()
 
 mvp_df = mvp_df.rename(columns={"Points  Points  Arrow up  Arrow down  Total Points": "Pts"})
 mvp_df = mvp_df[['Player', 'Player Short Name', 'Team', 'Position', 'Pts']]
+
+# ==========================================
+# ADD OWNER MAPPING FROM AUCTION DATA
+# ==========================================
+print("📋 Adding owner mapping from auction data...")
+
+# Load auction data from both groups
+player_to_owner = {}
+
+for group_name in ['group_1']:  # Add more groups if needed
+    auction_file = f'./{group_name}/AuctionSummary.csv'
+    if os.path.exists(auction_file):
+        try:
+            fantasy_teams_df = pd.read_csv(auction_file)
+            fantasy_mgrs = [c.strip() for c in fantasy_teams_df.columns]
+            fantasy_teams_df.columns = fantasy_mgrs
+            
+            for mgr in fantasy_mgrs:
+                mgr_players = fantasy_teams_df[mgr].dropna().astype(str).str.lower().str.strip().tolist()
+                for player in mgr_players:
+                    player_to_owner[player] = mgr
+            
+            print(f"✅ Loaded {len(fantasy_mgrs)} managers from {group_name}")
+        except Exception as e:
+            print(f"⚠️  Could not load {auction_file}: {e}")
+
+# Add Owner column to MVP dataframe
+mvp_df['Owner'] = mvp_df['Player'].map(player_to_owner).fillna('Unowned')
+
+print(f"✅ Mapped {len([o for o in mvp_df['Owner'] if o != 'Unowned'])} players to owners")
 
 mvp_df.to_csv(f'./data/mvp_{day}.csv', index=False)
 
