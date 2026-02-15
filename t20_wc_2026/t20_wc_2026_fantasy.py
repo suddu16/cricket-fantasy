@@ -112,15 +112,30 @@ plt.savefig(f'./{group}/points_trend.png')
 plt.close()
 
 # ==========================================
-# 6. UPDATE README (GITHUB VIEW)
+# 6. UPDATE README (FOR THE LIVE WEBSITE)
 # ==========================================
+# Your GitHub Username and Repo Name
+username = "suddu16"
+repo = "cricket-fantasy"
+
+# Create RAW links that GitHub Pages loves
+trend_url = f"https://raw.githubusercontent.com/{username}/{repo}/main/{group}/points_trend.png"
+dist_url = f"https://raw.githubusercontent.com/{username}/{repo}/main/{group}/manager_distribution.png"
+
 with open("README.md", "w") as f:
     f.write(f"# 🏏 T20 WC 2026 Fantasy - {group.upper()}\n\n")
+    
+    f.write("## 📈 Performance Visuals\n")
+    # Using the RAW links ensures the website can find them
+    f.write(f"![Trend Graph]({trend_url})\n\n")
+    f.write(f"![Points Distribution]({dist_url})\n\n")
+    
+    f.write("--- \n\n")
     f.write("## 🏆 Standings\n")
     f.write(scores_df.to_markdown(index=False) + "\n\n")
-    f.write("## 🕵️ Who Owns Whom (Top 10 Scorers)\n")
+    
+    f.write("## 🕵️ Who Owns Whom (Top 10)\n")
     f.write(mvp_df.head(10)[['Player', 'Pts', 'Owner']].to_markdown(index=False) + "\n\n")
-    f.write("## 📈 Performance Visuals\n")
-    f.write(f"![Trend](./{group}/points_trend.png)\n")
 
+print("✅ README updated with absolute image paths!")
 print(f"✅ Full update complete for {day}! Ready to push.")
