@@ -1,8 +1,7 @@
 name: T20 WC 2026 Fantasy points calculator
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "53 17 * * *"
+
 permissions: write-all
 jobs:
   scrape:
