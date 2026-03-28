@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>T20 World Cup 2026 Fantasy League</title>
+    <title>IPL 2026 Fantasy League</title>
     
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
@@ -27,8 +27,8 @@
             </div>
             <h1 class="text-center cricket-title">
                 <span class="cricket-icon">🏏</span>
-                T20 World Cup Fantasy League
-                <span class="cricket-icon">🌍</span>
+                IPL 2026 Fantasy League
+                <span class="cricket-icon">�</span>
             </h1>
             <p class="text-center cricket-subtitle">
                 <span class="pulse-dot"></span>
@@ -58,71 +58,111 @@
             <span class="tab-icon">👤</span> Group 1 Players
         </a>
     </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" data-bs-toggle="tab" href="#group_2" role="tab">
+            <span class="tab-icon">🏏</span> Group 2 Standings
+        </a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" data-bs-toggle="tab" href="#group_2_players" role="tab">
+            <span class="tab-icon">👤</span> Group 2 Players
+        </a>
+    </li>
 </ul>
 
     <!-- Tab Contents -->
     <div class="tab-content mt-3">
         <div id="data" class="tab-pane fade show active">
             <h2>MVP Data</h2>
+            <div class="mb-2">
+                <div class="btn-group" role="group" aria-label="MVP Source">
+                    <input type="radio" class="btn-check" name="mvpSource" id="srcCricketxi" value="cricketxi" checked>
+                    <label class="btn btn-outline-primary" for="srcCricketxi">CricketXI</label>
+                    <input type="radio" class="btn-check" name="mvpSource" id="srcIplt20" value="iplt20">
+                    <label class="btn btn-outline-primary" for="srcIplt20">IPLT20</label>
+                </div>
+            </div>
             <select id="dataSelector" class="form-select" onchange="loadCSV('data')"></select>
             <p id="dataMessage" class="mt-2"></p>
-<table id="dataTable" class="table table-striped">
-</table>
+            <div id="dataTable"></div>
         </div>
 
         <div id="group_1" class="tab-pane fade">
             <h2>Group 1</h2>
             <select id="group_1Selector" class="form-select" onchange="loadCSV('group_1')"></select>
             <p id="group_1Message" class="mt-2"></p>
-            
             <div class="mb-4 row">
                 <div class="col-md-9">
                     <canvas id="group_1Chart" style="height: 600px;"></canvas>
                 </div>
                 <div class="col-md-3">
                     <div id="group_1Rankings" class="card" style="height: 600px;">
-                        <div class="card-header bg-primary text-white">
-                            <strong>Current Rankings</strong>
-                        </div>
+                        <div class="card-header bg-primary text-white"><strong>Current Rankings</strong></div>
                         <div class="card-body p-2" style="overflow-y: auto;">
                             <div id="group_1RankingsList"></div>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Animated Progression GIF -->
-            <div class="mb-4">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <strong>🎬 Animated Points Progression</strong>
-                    </div>
-                    <div class="card-body text-center p-0">
-                        <img id="group_1ProgressionGif" src="" alt="Points Progression Animation" style="width: 100%; max-width: 100%; border-radius: 0 0 8px 8px;">
-                    </div>
-                </div>
-            </div>
-            
             <div id="group_1Table"></div>
         </div>
 
         <div id="group_1_players" class="tab-pane fade">
-    <h2>Group 1 Players</h2>
-    <select id="group_1PlayersSelector" onchange="loadCSV('group_1Players')">
-        <option value="">Select a Player</option>
-        <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/t20_wc_2026/group_1/mahaarajanmg.csv">Mahaarajan</option>
-        <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/t20_wc_2026/group_1/ntkesh.csv">Naren</option>
-        <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/t20_wc_2026/group_1/neela.csv">Niranjini</option>
-        <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/t20_wc_2026/group_1/AkshayM.csv">Akshay</option>
-        <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/t20_wc_2026/group_1/ColdTaker.csv">Raghav</option>
-        <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/t20_wc_2026/group_1/ds&ps.csv">Shashaank</option>
-        <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/t20_wc_2026/group_1/sk.csv">Srikumar</option>
-        <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/t20_wc_2026/group_1/Sriram.csv">Sriram</option>
-        <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/t20_wc_2026/group_1/sudarshan.csv">Sudarshan</option>
-    </select>
-    <p id="group_1PlayerMessage"></p>
-    <div id="group_1PlayerTable"></div>
-</div>
+            <h2>Group 1 Players</h2>
+            <select id="group_1PlayersSelector" onchange="loadCSV('group_1Players')">
+                <option value="">Select a Player</option>
+                <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/ipl2026/group_1/AkshayM.csv">AkshayM</option>
+                <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/ipl2026/group_1/ColdTaker.csv">ColdTaker</option>
+                <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/ipl2026/group_1/Naren.csv">Naren</option>
+                <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/ipl2026/group_1/Neela.csv">Neela</option>
+                <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/ipl2026/group_1/mahaarajan13.csv">Mahaarajan</option>
+                <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/ipl2026/group_1/priyanka.suresh.csv">Priyanka</option>
+                <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/ipl2026/group_1/shashaank.csv">Shashaank</option>
+                <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/ipl2026/group_1/sk.csv">SK</option>
+                <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/ipl2026/group_1/sriram.csv">Sriram</option>
+                <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/ipl2026/group_1/suddu.csv">Suddu</option>
+            </select>
+            <p id="group_1PlayerMessage"></p>
+            <div id="group_1PlayerTable"></div>
+        </div>
+
+        <div id="group_2" class="tab-pane fade">
+            <h2>Group 2</h2>
+            <select id="group_2Selector" class="form-select" onchange="loadCSV('group_2')"></select>
+            <p id="group_2Message" class="mt-2"></p>
+            <div class="mb-4 row">
+                <div class="col-md-9">
+                    <canvas id="group_2Chart" style="height: 600px;"></canvas>
+                </div>
+                <div class="col-md-3">
+                    <div id="group_2Rankings" class="card" style="height: 600px;">
+                        <div class="card-header bg-primary text-white"><strong>Current Rankings</strong></div>
+                        <div class="card-body p-2" style="overflow-y: auto;">
+                            <div id="group_2RankingsList"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="group_2Table"></div>
+        </div>
+
+        <div id="group_2_players" class="tab-pane fade">
+            <h2>Group 2 Players</h2>
+            <select id="group_2PlayersSelector" onchange="loadCSV('group_2Players')">
+                <option value="">Select a Player</option>
+                <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/ipl2026/group_2/Arvindh.csv">Arvindh</option>
+                <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/ipl2026/group_2/Kumar%20%26%20Akash.csv">Kumar &amp; Akash</option>
+                <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/ipl2026/group_2/Manav%20%26%20Sri.csv">Manav &amp; Sri</option>
+                <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/ipl2026/group_2/Mira%20%26%20Arjun.csv">Mira &amp; Arjun</option>
+                <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/ipl2026/group_2/Niranjani.csv">Niranjani</option>
+                <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/ipl2026/group_2/Raghav.csv">Raghav</option>
+                <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/ipl2026/group_2/Sriram%20V.csv">Sriram V</option>
+                <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/ipl2026/group_2/Vasan.csv">Vasan</option>
+                <option value="https://raw.githubusercontent.com/suddu16/cricket-fantasy/main/ipl2026/group_2/Vasanth.csv">Vasanth</option>
+            </select>
+            <p id="group_2PlayerMessage"></p>
+            <div id="group_2PlayerTable"></div>
+        </div>
 
     </div>
 </div>

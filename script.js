@@ -1,75 +1,93 @@
-const folders = ["data", "group_1"];
-const maxDays = 31;
+const folders = ["data", "group_1", "group_2"];
 const mainlineBranch = `https://raw.githubusercontent.com/suddu16/cricket-fantasy/main`;
-const tournament = `t20_wc_2026`
+const githubApiBase = `https://api.github.com/repos/suddu16/cricket-fantasy/contents`;
+const tournament = `ipl2026`;
+const resultsPrefix = `ipl_2026`;
 
 // Store chart instances to destroy before recreating
 let chartInstances = {};
 
-// Function to populate dropdowns for each tab
-async function populateDropdowns() {
-    for (const folder of folders) {
-        const select = document.getElementById(`${folder}Selector`);
-        let latestDay = 1;
-        
-        if (folder === 'data') {
-            for (let i = 1; i <= maxDays; i++) { 
-                const filename = `${mainlineBranch}/${tournament}/data/mvp_day_${i}.csv`;
+// Cache for progression data to avoid re-fetching on every day change
+const progressionCache = {};
 
-                const option = document.createElement("option");
-                option.value = filename;
-                option.textContent = `Day ${i}`;
-                select.appendChild(option);
-            }
-            
-            // Find the latest available day for MVP data
-            latestDay = await findLatestDay(folder, 'mvp');
-            if (latestDay > 0) {
-                select.selectedIndex = latestDay - 1; // Set to latest day (0-indexed)
-                loadCSV('data'); // Load the data for the selected day
-            }
-        } else {
-            for (let day = 1; day <= maxDays; day++) {
-                const option = document.createElement("option");
-                option.value = `${mainlineBranch}/${tournament}/${folder}/${tournament}_results_day_${day}.csv`;
-                option.textContent = `Day ${day}`;
-                select.appendChild(option);
-            }
+// Populate just the MVP dropdown for a given source
+async function populateMvpDropdown(mvpSource) {
+    const select = document.getElementById('dataSelector');
+    select.innerHTML = ''; // clear existing options
+    const latestDay = await findLatestDay('data', 'mvp', mvpSource);
+    for (let i = 1; i <= latestDay; i++) {
+        const option = document.createElement("option");
+        option.value = `${mainlineBranch}/${tournament}/data/${mvpSource}/mvp_day_${i}.csv`;
+        option.textContent = `Day ${i}`;
+        select.appendChild(option);
+    }
+    select.selectedIndex = latestDay - 1;
+    loadCSV('data');
+}
+
+async function populateDropdowns() {
+    // Fetch latest days for group folders in parallel
+    const [g1Latest, g2Latest] = await Promise.all([
+        findLatestDay('group_1', 'results'),
+        findLatestDay('group_2', 'results'),
+    ]);
+
+    // Populate MVP dropdown with default source
+    const defaultSource = document.querySelector('input[name="mvpSource"]:checked').value;
+    await populateMvpDropdown(defaultSource);
+
+    // Wire up source toggle
+    document.querySelectorAll('input[name="mvpSource"]').forEach(radio => {
+        radio.addEventListener('change', () => populateMvpDropdown(radio.value));
+    });
+
+    // Populate group dropdowns
+    const groupLatest = { group_1: g1Latest, group_2: g2Latest };
+    for (const folder of ["group_1", "group_2"]) {
+        const select = document.getElementById(`${folder}Selector`);
+        const latestDay = groupLatest[folder];
+        for (let day = 1; day <= latestDay; day++) {
             const option = document.createElement("option");
-            option.value = `${mainlineBranch}/${tournament}/${folder}/${tournament}_results_day_final.csv`;
-            option.textContent = `Final`;
+            option.value = `${mainlineBranch}/${tournament}/${folder}/${resultsPrefix}_results_day_${day}.csv`;
+            option.textContent = `Day ${day}`;
             select.appendChild(option);
-            
-            // Find the latest available day for group data
-            latestDay = await findLatestDay(folder, 'results');
-            if (latestDay > 0) {
-                select.selectedIndex = latestDay - 1; // Set to latest day (0-indexed)
-                loadCSV(folder); // Load the data for the selected day
-            }
         }
+        const finalOption = document.createElement("option");
+        finalOption.value = `${mainlineBranch}/${tournament}/${folder}/${resultsPrefix}_results_day_final.csv`;
+        finalOption.textContent = `Final`;
+        select.appendChild(finalOption);
+        select.selectedIndex = latestDay - 1;
+        loadCSV(folder);
     }
 }
 
-// Function to find the latest available day by checking file existence
-async function findLatestDay(folder, type) {
-    for (let day = maxDays; day >= 1; day--) {
-        let filename;
+// Function to find the latest available day using GitHub Contents API (1 request instead of 31)
+async function findLatestDay(folder, type, mvpSource) {
+    try {
+        let apiPath;
         if (type === 'mvp') {
-            filename = `${mainlineBranch}/${tournament}/data/mvp_day_${day}.csv`;
+            apiPath = `${githubApiBase}/${tournament}/data/${mvpSource}`;
         } else {
-            filename = `${mainlineBranch}/${tournament}/${folder}/${tournament}_results_day_${day}.csv`;
+            apiPath = `${githubApiBase}/${tournament}/${folder}`;
         }
-        
-        try {
-            const response = await fetch(filename, { method: "HEAD" });
-            if (response.ok) {
-                return day; // Return the latest available day
+        const response = await fetch(apiPath);
+        if (!response.ok) return 1;
+        const files = await response.json();
+        const pattern = type === 'mvp'
+            ? /^mvp_day_(\d+)\.csv$/
+            : new RegExp(`^${resultsPrefix}_results_day_(\\d+)\\.csv$`);
+        let maxDay = 1;
+        for (const file of files) {
+            const match = file.name.match(pattern);
+            if (match) {
+                const day = parseInt(match[1]);
+                if (day > maxDay) maxDay = day;
             }
-        } catch (error) {
-            // Continue checking previous days
         }
+        return maxDay;
+    } catch (error) {
+        return 1;
     }
-    return 1; // Default to day 1 if no files found
 }
 
 // Function to load CSV and check if it exists
@@ -77,11 +95,12 @@ async function loadCSV(folder) {
     let select, filename, messageDiv, tableDiv;
 
     // Set up player tabs
-    if (folder === "group_1Players") {
-        select = document.getElementById("group_1PlayersSelector");
+    if (folder === "group_1Players" || folder === "group_2Players") {
+        const groupKey = folder.replace("Players", "");
+        select = document.getElementById(`${folder}Selector`);
         filename = select.value;
-        messageDiv = document.getElementById("group_1PlayerMessage");
-        tableDiv = document.getElementById("group_1PlayerTable");
+        messageDiv = document.getElementById(`${groupKey}PlayerMessage`);
+        tableDiv = document.getElementById(`${groupKey}PlayerTable`);
     } else {
         // Set up other tabs (data, group_1)
         select = document.getElementById(`${folder}Selector`);
@@ -96,14 +115,11 @@ async function loadCSV(folder) {
     }
 
     try {
-        const response = await fetch(filename, { method: "HEAD" });
-
-        if (!response.ok) throw new Error("File not found");
-
         messageDiv.textContent = `Loading ${filename}...`;
 
-        // Fetch the CSV data
+        // Fetch the CSV data directly (HEAD requests are unreliable on raw.githubusercontent.com)
         const csvResponse = await fetch(filename);
+        if (!csvResponse.ok) throw new Error("File not found");
         const csvText = await csvResponse.text();
 
         // Convert CSV text to a 2D array, filtering out empty rows
@@ -132,8 +148,7 @@ async function loadCSV(folder) {
                 th.textContent = field;
                 headerRow.appendChild(th);
             });
-        } else if (folder === "group_1Players") {
-            // For player groups, use the first row as header, and reverse columns for days
+        } else if (folder === "group_1Players" || folder === "group_2Players") {
             const totalDays = rows[0].length - 1;
             headerRow.appendChild(createHeaderCell("Player")); // First column remains "Player"
             for (let day = totalDays; day >= 1; day--) {
@@ -172,8 +187,7 @@ async function loadCSV(folder) {
                 row.forEach(cell => {
                     tr.appendChild(createCell(cell));
                 });
-            } else if (folder === "group_1Players") {
-                // For player groups, reverse the order and highlight changes
+            } else if (folder === "group_1Players" || folder === "group_2Players") {
                 tr.appendChild(createCell(row[0])); // Player name first
                 
                 // Build array of values in reverse order (most recent first)
@@ -233,7 +247,7 @@ async function loadCSV(folder) {
         table.appendChild(tbody);
 
         // Add total row for player groups showing daily points gained
-        if (folder === "group_1Players") {
+        if (folder === "group_1Players" || folder === "group_2Players") {
             const tfoot = document.createElement("tfoot");
             const totalRow = document.createElement("tr");
             totalRow.style.fontWeight = "bold";
@@ -275,15 +289,8 @@ async function loadCSV(folder) {
         // Clear message after successful load
         messageDiv.textContent = "";
 
-        // Create chart for group_1 if applicable
-        if (folder === "group_1") {
-            // Set the animated GIF source
-            const gifElement = document.getElementById('group_1ProgressionGif');
-            if (gifElement) {
-                const timestamp = new Date().getTime(); // Cache buster
-                gifElement.src = `${mainlineBranch}/${tournament}/${folder}/points_progression.gif?v=${timestamp}`;
-            }
-            
+        // Create chart for group_1 or group_2 if applicable
+        if (folder === "group_1" || folder === "group_2") {
             await createProgressionChart(folder, rows);
             await displayDailyPointsAndTopScorer(folder, rows);
         }
@@ -312,7 +319,7 @@ async function loadCSV(folder) {
         }
 
     } catch (error) {
-        messageDiv.textContent = `File not found: ${filename}. Wait for it to be generated.`;
+        messageDiv.textContent = `Failed to load data. Try refreshing or selecting another day.`;
     }
 }
 
@@ -347,7 +354,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             tab.show();
             
             // Load data for the activated tab if not already loaded
-            if (tabParam === 'group_1') {
+            if (tabParam === 'group_1' || tabParam === 'group_2') {
                 loadCSV(tabParam);
             }
         }
@@ -384,12 +391,17 @@ async function createProgressionChart(folder, currentDayData) {
     const selectedOption = select.options[select.selectedIndex].text;
     const currentDay = parseInt(selectedOption.replace('Day ', ''));
 
-    // Fetch data from Day 0 to current day
+    // Fetch data from Day 0 to current day, using cache to avoid redundant requests
     const allDaysData = [];
     
     for (let day = 0; day <= currentDay; day++) {
+        const cacheKey = `${folder}_day_${day}`;
+        if (progressionCache[cacheKey]) {
+            allDaysData.push(progressionCache[cacheKey]);
+            continue;
+        }
         try {
-            const filename = `${mainlineBranch}/${tournament}/${folder}/${tournament}_results_day_${day}.csv`;
+            const filename = `${mainlineBranch}/${tournament}/${folder}/${resultsPrefix}_results_day_${day}.csv`;
             const response = await fetch(filename);
             
             if (response.ok) {
@@ -400,8 +412,9 @@ async function createProgressionChart(folder, currentDayData) {
                     .map(row => row.split(","))
                     .filter(row => row.length > 1 && row[0] && row[0].trim() !== '');
                 
-                console.log(`Day ${day}: Found ${rows.length - 1} players`); // Debug log
-                allDaysData.push({ day, rows });
+                const entry = { day, rows };
+                progressionCache[cacheKey] = entry;
+                allDaysData.push(entry);
             }
         } catch (error) {
             console.log(`Day ${day} data not available`);
