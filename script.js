@@ -57,7 +57,7 @@ async function populateDropdowns() {
         finalOption.textContent = `Final`;
         select.appendChild(finalOption);
         select.selectedIndex = latestDay - 1;
-        loadCSV(folder);
+        // Don't eagerly load — wait for user to click the tab
     }
 }
 
@@ -305,7 +305,7 @@ async function loadCSV(folder) {
                 ordering: true, 
                 pageLength: 20,
                 info: true,
-                order: [[2, "desc"]] 
+                order: [[1, "desc"]] 
             });
         } else {
             // For group_1, sort by the last column
@@ -319,7 +319,8 @@ async function loadCSV(folder) {
         }
 
     } catch (error) {
-        messageDiv.textContent = `Failed to load data. Try refreshing or selecting another day.`;
+        messageDiv.textContent = `Failed to load data: ${error.message}`;
+        console.error('loadCSV error:', error);
     }
 }
 
@@ -341,33 +342,44 @@ function createCell(text) {
 document.addEventListener("DOMContentLoaded", async () => {
     await populateDropdowns();
 
+    // Load group data on demand when tab is clicked
+    const loadedTabs = {};
+    ['group_1', 'group_2'].forEach(folder => {
+        const tabEl = document.querySelector(`[href="#${folder}"]`);
+        if (tabEl) {
+            tabEl.addEventListener('shown.bs.tab', () => {
+                if (!loadedTabs[folder]) {
+                    loadedTabs[folder] = true;
+                    loadCSV(folder);
+                }
+            });
+        }
+    });
+
     // Get the URL parameters
     const params = new URLSearchParams(window.location.search);
-    const tabParam = params.get("tab");  // e.g., ?tab=group_1
-    const dropdownParam = params.get("dropdown"); // e.g., ?dropdown=day_6
+    const tabParam = params.get("tab");
+    const dropdownParam = params.get("dropdown");
 
-    // Activate the tab if the parameter exists
     if (tabParam) {
         const tabElement = document.querySelector(`[href="#${tabParam}"]`);
         if (tabElement) {
             const tab = new bootstrap.Tab(tabElement);
             tab.show();
-            
-            // Load data for the activated tab if not already loaded
             if (tabParam === 'group_1' || tabParam === 'group_2') {
+                loadedTabs[tabParam] = true;
                 loadCSV(tabParam);
             }
         }
     }
 
-    // Select the dropdown option if the parameter exists
     if (dropdownParam) {
         const dropdowns = document.querySelectorAll("select");
         dropdowns.forEach(select => {
             const option = select.querySelector(`option[value*="${dropdownParam}"]`);
             if (option) {
                 select.value = option.value;
-                select.dispatchEvent(new Event("change")); // Trigger change event if needed
+                select.dispatchEvent(new Event("change"));
             }
         });
     }
@@ -386,69 +398,34 @@ async function createProgressionChart(folder, currentDayData) {
         chartInstances[canvasId].destroy();
     }
 
-    // Get the selected day from dropdown
-    const select = document.getElementById(`${folder}Selector`);
-    const selectedOption = select.options[select.selectedIndex].text;
-    const currentDay = parseInt(selectedOption.replace('Day ', ''));
+    // Build allDaysData directly from currentDayData columns — zero extra fetches.
+    // Each row is [playerName, day0pts, day1pts, ..., dayNpts]
+    const hasHeader = isNaN(parseFloat(currentDayData[0][currentDayData[0].length - 1]));
+    const dataRows = hasHeader ? currentDayData.slice(1) : currentDayData;
+    const numDays = dataRows[0].length - 1; // number of day columns
 
-    // Fetch data from Day 0 to current day, using cache to avoid redundant requests
     const allDaysData = [];
-    
-    for (let day = 0; day <= currentDay; day++) {
-        const cacheKey = `${folder}_day_${day}`;
-        if (progressionCache[cacheKey]) {
-            allDaysData.push(progressionCache[cacheKey]);
-            continue;
-        }
-        try {
-            const filename = `${mainlineBranch}/${tournament}/${folder}/${resultsPrefix}_results_day_${day}.csv`;
-            const response = await fetch(filename);
-            
-            if (response.ok) {
-                const csvText = await response.text();
-                const rows = csvText.split("\n")
-                    .map(row => row.trim())
-                    .filter(row => row.length > 0)
-                    .map(row => row.split(","))
-                    .filter(row => row.length > 1 && row[0] && row[0].trim() !== '');
-                
-                const entry = { day, rows };
-                progressionCache[cacheKey] = entry;
-                allDaysData.push(entry);
-            }
-        } catch (error) {
-            console.log(`Day ${day} data not available`);
-        }
+    for (let col = 1; col <= numDays; col++) {
+        const day = col - 1;
+        const rows = dataRows.map(row => [row[0], row[col]]);
+        allDaysData.push({ day, rows });
     }
 
     if (allDaysData.length === 0) return;
 
-    // Extract player names from the first available day (skip header if it exists)
-    const firstDayRows = allDaysData[0].rows;
-    // Check if first row is a header by seeing if it has non-numeric values in the points column
-    const hasHeader = isNaN(parseFloat(firstDayRows[0][firstDayRows[0].length - 1]));
-    const playerNames = hasHeader ? firstDayRows.slice(1).map(row => row[0]) : firstDayRows.map(row => row[0]);
-
-    // Generate colors for each player
+    const playerNames = dataRows.map(row => row[0]);
     const colors = generateColors(playerNames.length);
 
-    // Build datasets for each player
     const datasets = playerNames.map((playerName, index) => {
         const data = allDaysData.map(dayData => {
-            const startIndex = hasHeader ? 1 : 0;
-            const playerRow = dayData.rows.slice(startIndex).find(row => row[0] === playerName);
-            if (playerRow) {
-                // Get the total points (last column)
-                return parseFloat(playerRow[playerRow.length - 1]) || 0;
-            }
-            return 0;
+            const playerRow = dayData.rows.find(row => row[0] === playerName);
+            return playerRow ? (parseFloat(playerRow[1]) || 0) : 0;
         });
-
         return {
             label: playerName,
             data: data,
             borderColor: colors[index],
-            backgroundColor: colors[index] + '33', // Add transparency
+            backgroundColor: colors[index] + '33',
             borderWidth: 2,
             tension: 0.1,
             pointRadius: 4,
@@ -456,7 +433,6 @@ async function createProgressionChart(folder, currentDayData) {
         };
     });
 
-    // Create labels for x-axis
     const labels = allDaysData.map(d => `Day ${d.day}`);
 
     // Create the chart
@@ -615,14 +591,10 @@ function updateRankingsDisplay(folder, allDaysData, dayIndex, playerColorMap) {
     const dayData = allDaysData[dayIndex];
     const day = dayData.day;
     
-    // Check if first row is a header
-    const hasHeader = isNaN(parseFloat(dayData.rows[0][dayData.rows[0].length - 1]));
-    const startIndex = hasHeader ? 1 : 0;
-    
-    // Get player data for this day
-    const players = dayData.rows.slice(startIndex).map(row => ({
+    // rows are [playerName, points] — no header
+    const players = dayData.rows.map(row => ({
         name: row[0],
-        points: parseFloat(row[row.length - 1]) || 0
+        points: parseFloat(row[1]) || 0
     }));
     
     // Sort by points descending
@@ -632,12 +604,9 @@ function updateRankingsDisplay(folder, allDaysData, dayIndex, playerColorMap) {
     let positionChanges = {};
     if (dayIndex > 0) {
         const prevDayData = allDaysData[dayIndex - 1];
-        const prevHasHeader = isNaN(parseFloat(prevDayData.rows[0][prevDayData.rows[0].length - 1]));
-        const prevStartIndex = prevHasHeader ? 1 : 0;
-        
-        const prevPlayers = prevDayData.rows.slice(prevStartIndex).map(row => ({
+        const prevPlayers = prevDayData.rows.map(row => ({
             name: row[0],
-            points: parseFloat(row[row.length - 1]) || 0
+            points: parseFloat(row[1]) || 0
         }));
         prevPlayers.sort((a, b) => b.points - a.points);
         
