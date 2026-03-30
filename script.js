@@ -176,7 +176,7 @@ async function loadCSV(folder) {
         // Table body
         const tbody = document.createElement("tbody");
         var startIndex = 1
-        if (folder == "group_1") {
+        if (folder == "group_1" || folder == "group_2") {
             startIndex = 0
         }
         rows.slice(startIndex).forEach(row => {
