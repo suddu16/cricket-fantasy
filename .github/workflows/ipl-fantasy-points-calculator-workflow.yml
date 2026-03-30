@@ -1,6 +1,8 @@
 name: IPL Fantasy points calculator
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "53 20 * * *"
 permissions: write-all
 jobs:
   scrape:
@@ -26,10 +28,10 @@ jobs:
 
       - name: Calculating points
         run: |
-         cd ipl2025
-         python ipl2025_fantasy_points_fetcher.py
-         python ipl2025_fantasy.py group_1
-         python ipl2025_fantasy.py group_2
+         cd ipl2026
+         python ipl_2026_fantasy_points_fetcher.py
+         python ipl_2026_fantasy.py group_1
+         python ipl_2026_fantasy.py group_2
          cd ..
         
       - name: Commit and Push The Results From Python Selenium Action
