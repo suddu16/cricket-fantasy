@@ -154,6 +154,22 @@ async function loadCSV(folder) {
             for (let day = totalDays; day >= 1; day--) {
                 headerRow.appendChild(createHeaderCell(rows[0][day])); // Use actual day names from CSV
             }
+            // Pin team name (row 1) as a second header row so it's never sorted
+            const teamRow = document.createElement("tr");
+            teamRow.style.backgroundColor = "#e8f4fd";
+            teamRow.style.fontWeight = "bold";
+            // Render team row cells in same reversed-day order as the body
+            const teamNameCell = document.createElement("th");
+            teamNameCell.textContent = rows[1][0] || '';
+            teamRow.appendChild(teamNameCell);
+            for (let i = rows[1].length - 1; i >= 1; i--) {
+                const td = document.createElement("th");
+                td.textContent = rows[1][i] || '';
+                teamRow.appendChild(td);
+            }
+            thead.appendChild(headerRow);
+            thead.appendChild(teamRow);
+            table.appendChild(thead);
         } else {
             // Other groups (group_1) - Display players as rows, days as columns (reversed)
             headerRow.appendChild(createHeaderCell("Player"));
@@ -170,14 +186,20 @@ async function loadCSV(folder) {
             }
         }
 
-        thead.appendChild(headerRow);
-        table.appendChild(thead);
+        // thead already appended inside the player branch above
+        if (folder !== "group_1Players" && folder !== "group_2Players") {
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+        }
 
         // Table body
         const tbody = document.createElement("tbody");
         var startIndex = 1
         if (folder == "group_1" || folder == "group_2") {
             startIndex = 0
+        }
+        if (folder == "group_1Players" || folder == "group_2Players") {
+            startIndex = 2 // skip header row and team row
         }
         rows.slice(startIndex).forEach(row => {
             const tr = document.createElement("tr");
