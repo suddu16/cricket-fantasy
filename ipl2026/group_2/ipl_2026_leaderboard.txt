@@ -2,11 +2,11 @@
 ```
 | Manager       |   Points |
 |:--------------|---------:|
+| Sriram V      |    143.5 |
 | Manav & Sri   |    117   |
-| Sriram V      |     95   |
 | Raghav        |     93   |
 | Vasanth       |     88.5 |
-| Arvindh       |     77   |
+| Arvindh       |     82   |
 | Vasan         |     57   |
 | Mira & Arjun  |     56.5 |
 | Kumar & Akash |     48.5 |
