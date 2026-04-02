@@ -6,9 +6,9 @@
 | Vasan         |    182   |
 | Kumar & Akash |    171   |
 | Sriram V      |    161.5 |
-| Manav & Sri   |    145.5 |
-| Niranjani     |    144   |
-| Vasanth       |    128   |
+| Manav & Sri   |    148   |
+| Vasanth       |    146.5 |
+| Niranjani     |    146.5 |
 | Raghav        |    126   |
 | Arvindh       |    120   |
 ```
