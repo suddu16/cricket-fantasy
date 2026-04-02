@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[15]:
 
 
 import pandas as pd
@@ -28,7 +28,7 @@ pd.set_option('display.max_rows',None) #display all rows
 #  pip3 install thefuzz
 
 
-# In[2]:
+# In[16]:
 
 
 from datetime import date
@@ -42,7 +42,7 @@ prev_day = 'day_' + str(day_num - 1)
 print(day_num)
 
 
-# In[3]:
+# In[ ]:
 
 
 from selenium import webdriver
@@ -112,7 +112,7 @@ filepath.parent.mkdir(parents=True, exist_ok=True)
 mvp_df.to_csv(filepath, index=False)
 
 
-# In[5]:
+# In[ ]:
 
 
 driver = webdriver.Chrome(options=chrome_options)
@@ -145,9 +145,6 @@ mvp_df = [table for table in tables if 'Pts' in table][0]
 mvp_df[['Player', 'Team']] = mvp_df['Player'].str.rsplit(' ', n=1, expand=True)
 mvp_df['Player'] = mvp_df['Player'].str.replace('\\s+', ' ', regex=True)
 mvp_df['Player'] = mvp_df['Player'].str.lower()
-
-mvp_df = mvp_df[['Player', 'Pts']]
-
 
 filepath = Path(f'./data/iplt20/mvp_{day}.csv')
 filepath.parent.mkdir(parents=True, exist_ok=True)
