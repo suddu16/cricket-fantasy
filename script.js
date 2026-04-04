@@ -364,6 +364,9 @@ function createCell(text) {
 document.addEventListener("DOMContentLoaded", async () => {
     await populateDropdowns();
 
+    // This forces Group 1 to load its data immediately after dropdowns are ready
+    loadCSV('group_1');
+    
     // Load group data on demand when tab is clicked
     const loadedTabs = {};
     ['group_1', 'group_2'].forEach(folder => {
