@@ -87,24 +87,33 @@
             <div id="dataTable"></div>
         </div>
 
-        <div id="group_1" class="tab-pane fade show active">
-            <h2>Group 1</h2>
-            <select id="group_1Selector" class="form-select" onchange="loadCSV('group_1')"></select>
-            <p id="group_1Message" class="mt-2"></p>
+        <div id="group_1" class="tab-pane fade show active" role="tabpanel" aria-labelledby="group_1-tab">
+            <h2 class="mb-3">Group 1</h2>
+            
+            <select id="group_1Selector" class="form-select mb-3" onchange="loadCSV('group_1')">
+                </select>
+            
+            <p id="group_1Message" class="mt-2 text-muted"></p>
+            
             <div class="mb-4 row">
                 <div class="col-md-9">
-                    <canvas id="group_1Chart" style="height: 600px;"></canvas>
+                    <div style="position: relative; height: 600px;">
+                        <canvas id="group_1Chart"></canvas>
+                    </div>
                 </div>
                 <div class="col-md-3">
                     <div id="group_1Rankings" class="card" style="height: 600px;">
-                        <div class="card-header bg-primary text-white"><strong>Current Rankings</strong></div>
+                        <div class="card-header bg-primary text-white">
+                            <strong>Current Rankings</strong>
+                        </div>
                         <div class="card-body p-2" style="overflow-y: auto;">
                             <div id="group_1RankingsList"></div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div id="group_1Table"></div>
+            
+            <div id="group_1Table" class="table-responsive"></div>
         </div>
 
         <div id="group_1_players" class="tab-pane fade">
