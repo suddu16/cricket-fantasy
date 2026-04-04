@@ -56,7 +56,8 @@ async function populateDropdowns() {
         finalOption.value = `${mainlineBranch}/${tournament}/${folder}/${resultsPrefix}_results_day_final.csv`;
         finalOption.textContent = `Final`;
         select.appendChild(finalOption);
-        select.selectedIndex = latestDay - 1;
+        select.selectedIndex = Math.min(select.options.length - 1, latestDay - 1);
+        // select.selectedIndex = latestDay - 1;
         // Don't eagerly load — wait for user to click the tab
     }
 }
@@ -86,7 +87,17 @@ async function findLatestDay(folder, type, mvpSource) {
         }
         return maxDay;
     } catch (error) {
-        return 1;
+        console.warn(`API Error for ${folder}:`, error);
+        
+        // SMART FALLBACK: 
+        // Get today's date and calculate how many days since IPL started (March 27)
+        const startDate = new Date('2026-03-27');
+        const today = new Date();
+        const diffTime = Math.abs(today - startDate);
+        const currentTournamentDay = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        
+        // Return yesterday's day number as the "safe" latest day
+        return Math.max(1, currentTournamentDay - 1); 
     }
 }
 
