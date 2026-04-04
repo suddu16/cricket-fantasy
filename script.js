@@ -119,7 +119,20 @@ async function loadCSV(folder) {
 
         // Fetch the CSV data directly (HEAD requests are unreliable on raw.githubusercontent.com)
         const csvResponse = await fetch(filename);
-        if (!csvResponse.ok) throw new Error("File not found");
+        
+        if (!csvResponse.ok) {
+            // This happens if the CSV for today isn't uploaded yet
+            messageDiv.innerHTML = `
+                <div class="alert alert-info shadow-sm">
+                    <strong>Matches in Progress!</strong><br>
+                    Day 8 data is still being calculated. Showing latest available results below.
+                </div>`;
+            
+            // Optional: You could manually force it to load Day 7 here if Day 8 fails
+            loadCSVPreviousDay(folder); 
+            return; 
+        }
+        
         const csvText = await csvResponse.text();
 
         // Convert CSV text to a 2D array, filtering out empty rows
