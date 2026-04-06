@@ -4,8 +4,8 @@
 |:--------------|---------:|
 | Mira & Arjun  |    435.5 |
 | Vasan         |    422.5 |
+| Niranjani     |    356   |
 | Kumar & Akash |    353   |
-| Niranjani     |    347.5 |
 | Raghav        |    336.5 |
 | Arvindh       |    333.5 |
 | Manav & Sri   |    330   |
