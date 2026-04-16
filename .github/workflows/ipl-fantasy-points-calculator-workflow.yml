@@ -31,7 +31,6 @@ jobs:
          cd ipl2026
          python ipl_2026_fantasy_points_fetcher.py
          python ipl_2026_fantasy.py group_1
-         python ipl_2026_fantasy.py group_2
          cd ..
         
       - name: Commit and Push The Results From Python Selenium Action
