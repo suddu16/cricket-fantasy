@@ -37,7 +37,6 @@ from datetime import date
 ipl_day_0 = date(2026, 3, 27)
 ipl_day_cur = date.today()
 day_num = abs((ipl_day_cur - ipl_day_0).days)
-day_num = 20
 day = 'day_' + str(day_num)
 prev_day = 'day_' + str(day_num - 1)
 print(day_num)
