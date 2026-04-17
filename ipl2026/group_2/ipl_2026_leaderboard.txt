@@ -3,10 +3,10 @@
 | Manager       |   Points |
 |:--------------|---------:|
 | Vasan         |    820.5 |
+| Kumar & Akash |    770   |
 | Raghav        |    744   |
 | Vasanth       |    742.5 |
 | Niranjani     |    699   |
-| Kumar & Akash |    689.5 |
 | Mira & Arjun  |    673.5 |
 | Manav & Sri   |    672   |
 | Arvindh       |    640.5 |
