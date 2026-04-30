@@ -289,7 +289,6 @@ for col in sorted_cols:
 legend = plt.legend(sorted_handles, sorted_labels, bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0)
 
 plt.savefig(leaderboard_graph_file, bbox_inches="tight")
-plt.show()
 
 
 # In[108]:

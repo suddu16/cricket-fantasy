@@ -2,7 +2,7 @@
 ```
 | Manager       |   Points |
 |:--------------|---------:|
-| Raghav        | 1628.36  |
+| Raghav        | 1640.36  |
 | Mira & Arjun  | 1456.79  |
 | Kumar & Akash | 1366.43  |
 | Vasanth       | 1296.5   |
