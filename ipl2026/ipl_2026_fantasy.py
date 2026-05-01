@@ -43,7 +43,7 @@ ipl_day_0 = date(2026, 3, 27)
 ipl_day_cur = date.today()
 day_num = abs((ipl_day_cur - ipl_day_0).days)
 # Uncomment to set a specific day to get points for.
-day_num = int(sys.argv[2])
+# day_num = int(sys.argv[2])
 day = 'day_' + str(day_num)
 prev_day = 'day_' + str(day_num - 1)
 print(day_num)
