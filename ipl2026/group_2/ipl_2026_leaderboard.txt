@@ -4,7 +4,7 @@
 |:--------------|---------:|
 | Raghav        |   1645.5 |
 | Mira & Arjun  |   1458.5 |
-| Kumar & Akash |   1369   |
+| Kumar & Akash |   1389   |
 | Vasanth       |   1302.5 |
 | Vasan         |   1298   |
 | Arvindh       |   1242.5 |

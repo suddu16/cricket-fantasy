@@ -80,6 +80,7 @@ mvp_df
 # 1 pt per dot ball
 # 1 pt per run out (Run outs column stores iplt20 points at 3.5/run out, so divide by 3.5 to get count)
 if group_pts_source == 'iplt20':
+    run_out_pts = 3.5 if day_num < 32 else 0.5
     mvp_df['Pts'] = (
         mvp_df['Wkts'] * 3.5 +
         mvp_df['6s'] * 3.5 +
@@ -87,7 +88,7 @@ if group_pts_source == 'iplt20':
         mvp_df['Catches'] * 2.5 +
         mvp_df['Stumpings'] * 2.5 +
         mvp_df['Dots'] * 1 +
-        (mvp_df['Run outs'] / 0.5) * 1
+        (mvp_df['Run outs'] / run_out_pts) * 1
     )
 mvp_df
 
