@@ -1,14 +1,14 @@
-*DAY_37*
+*DAY_38*
 ```
 | Manager       |   Points |
 |:--------------|---------:|
 | Raghav        |   1758   |
-| Kumar & Akash |   1534   |
-| Mira & Arjun  |   1515   |
-| Vasanth       |   1499   |
+| Kumar & Akash |   1559.5 |
+| Mira & Arjun  |   1533.5 |
+| Vasanth       |   1508   |
 | Arvindh       |   1430   |
 | Vasan         |   1384   |
-| Niranjani     |   1336.5 |
-| Manav & Sri   |   1280   |
-| Sriram V      |    896.5 |
+| Niranjani     |   1345   |
+| Manav & Sri   |   1322   |
+| Sriram V      |   1067   |
 ```
