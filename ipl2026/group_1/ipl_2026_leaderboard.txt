@@ -1,15 +1,15 @@
-*DAY_39*
+*DAY_40*
 ```
 | Manager         |   Points |
 |:----------------|---------:|
-| Neela           |     6618 |
+| Neela           |     6621 |
 | suddu           |     6236 |
+| shashaank       |     6106 |
 | priyanka.suresh |     5981 |
-| AkshayM         |     5778 |
-| shashaank       |     5655 |
-| ColdTaker       |     4851 |
-| Naren           |     4321 |
+| AkshayM         |     5909 |
+| ColdTaker       |     4883 |
+| Naren           |     4549 |
 | sriram          |     4245 |
-| mahaarajan13    |     4172 |
+| mahaarajan13    |     4221 |
 | sk              |     4143 |
 ```
