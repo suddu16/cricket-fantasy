@@ -28,7 +28,7 @@ pd.set_option('display.max_rows',None) #display all rows
 #  pip3 install thefuzz
 
 
-# In[16]:
+# In[ ]:
 
 
 from datetime import date
@@ -37,8 +37,6 @@ from datetime import date
 ipl_day_0 = date(2026, 3, 27)
 ipl_day_cur = date.today()
 day_num = abs((ipl_day_cur - ipl_day_0).days)
-# Uncomment to set a specific day to get points for.
-# day_num = 30
 day = 'day_' + str(day_num)
 prev_day = 'day_' + str(day_num - 1)
 print(day_num)

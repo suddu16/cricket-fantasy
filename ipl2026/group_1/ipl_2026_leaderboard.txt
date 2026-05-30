@@ -2,12 +2,12 @@
 ```
 | Manager         |   Points |
 |:----------------|---------:|
+| priyanka.suresh |     9651 |
 | Neela           |     9602 |
-| priyanka.suresh |     9551 |
-| suddu           |     9425 |
+| suddu           |     9525 |
 | shashaank       |     8903 |
 | AkshayM         |     8092 |
-| sk              |     7560 |
+| sk              |     7660 |
 | Naren           |     6793 |
 | ColdTaker       |     6580 |
 | sriram          |     6202 |

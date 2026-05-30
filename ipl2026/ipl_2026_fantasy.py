@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[91]:
+# In[17]:
 
 
 import pandas as pd
@@ -16,6 +16,7 @@ pd.set_option('display.max_rows',None) #display all rows
 groups_pts_src_map = {'group_1': 'cricketxi', 'group_2': 'iplt20'}
 groups_team_wins_pts_map = {'group_1': 100, 'group_2': 50}
 groups_team_nr_pts_map = {'group_1': 50, 'group_2': 25}
+playoffs_wins_map = {'Royal Challengers Bengaluru': 1, 'Gujarat Titans': 1, 'Rajasthan Royals': 1}
 # Required Input files
 # When running for the very first time, `ipl2025_results.csv`` file is required with all the team managers and an initial row of 0s.
 # IPL2025MockAuctionSummary.csv file is required with each of the managers, their teams and their players listed.
@@ -30,7 +31,7 @@ groups_team_nr_pts_map = {'group_1': 50, 'group_2': 25}
 #  pip3 install tabulate
 
 
-# In[ ]:
+# In[2]:
 
 
 import sys
@@ -42,8 +43,7 @@ from datetime import date
 ipl_day_0 = date(2026, 3, 27)
 ipl_day_cur = date.today()
 day_num = abs((ipl_day_cur - ipl_day_0).days)
-# Uncomment to set a specific day to get points for.
-# day_num = int(sys.argv[2])
+# day_num = 19
 day = 'day_' + str(day_num)
 prev_day = 'day_' + str(day_num - 1)
 print(day_num)
@@ -64,14 +64,14 @@ leaderboard_file = f'./{group}/{tournament}_leaderboard.txt'
 ipl_mock_auction_summary = f'./{group}/AuctionSummary.csv'
 
 
-# In[93]:
+# In[3]:
 
 
 mvp_df = pd.read_csv(f'./data/{group_pts_source}/mvp_{day}.csv')
 mvp_df
 
 
-# In[94]:
+# In[4]:
 
 
 # For group_2 (iplt20 source), recalculate Pts using our own scoring rules:
@@ -80,7 +80,6 @@ mvp_df
 # 1 pt per dot ball
 # 1 pt per run out (Run outs column stores iplt20 points at 3.5/run out, so divide by 3.5 to get count)
 if group_pts_source == 'iplt20':
-    run_out_pts = 3.5 if day_num < 32 else 0.5
     mvp_df['Pts'] = (
         mvp_df['Wkts'] * 3.5 +
         mvp_df['6s'] * 3.5 +
@@ -88,26 +87,26 @@ if group_pts_source == 'iplt20':
         mvp_df['Catches'] * 2.5 +
         mvp_df['Stumpings'] * 2.5 +
         mvp_df['Dots'] * 1 +
-        (mvp_df['Run outs'] / run_out_pts) * 1
+        (mvp_df['Run outs'] / 0.5) * 1
     )
 mvp_df
 
 
-# In[95]:
+# In[5]:
 
 
 fantasy_teams_auction_df = pd.read_csv(ipl_mock_auction_summary)
 fantasy_teams_auction_df
 
 
-# In[96]:
+# In[6]:
 
 
 fantasy_mgrs = fantasy_teams_auction_df.columns
 fantasy_mgrs.to_list()
 
 
-# In[97]:
+# In[7]:
 
 
 #Make new dataframe for manager_teams 
@@ -115,7 +114,7 @@ fantasy_mgr_teams = fantasy_teams_auction_df.iloc[:1]
 fantasy_mgr_teams
 
 
-# In[98]:
+# In[8]:
 
 
 import os
@@ -135,7 +134,7 @@ for mgr in fantasy_teams_df.columns:
 fantasy_teams_df
 
 
-# In[99]:
+# In[9]:
 
 
 from thefuzz import fuzz
@@ -170,20 +169,20 @@ for mgr in fantasy_mgrs:
         print(f'All players have min fantasy points.')
 
 
-# In[100]:
+# In[10]:
 
 
 scores
 
 
-# In[101]:
+# In[11]:
 
 
 ipl_team_pts_tbl = pd.read_csv(f'./data/standings_{day}.csv')
 ipl_team_pts_tbl
 
 
-# In[102]:
+# In[19]:
 
 
 for mgr in fantasy_teams_df.columns:
@@ -196,13 +195,15 @@ for mgr in fantasy_teams_df.columns:
         no_of_nrs = ipl_team_pts_tbl.loc[ipl_team_pts_tbl['Teams'] == fantasy_mgr_teams[mgr].item(),'N/R'].item()
         if no_of_nrs == '-':
             no_of_nrs=0
+        team = fantasy_mgr_teams[mgr].values[0]
+        no_of_wins += playoffs_wins_map[team] if team in playoffs_wins_map else 0
         scores[mgr] += (float(no_of_wins)*group_team_win_pts)
         scores[mgr] += (float(no_of_nrs)*group_team_nr_pts)
         print(f'{str(mgr)}\t{str(fantasy_mgr_teams[mgr].values)}\twins:{str(no_of_wins)}\tnr:{str(no_of_nrs)}')
 scores
 
 
-# In[103]:
+# In[ ]:
 
 
 prev_scores = pd.read_csv(prev_results_file, header=None)
@@ -214,20 +215,20 @@ prev_scores_dicts = prev_scores.to_dict(orient='records')
 prev_scores_dicts
 
 
-# In[104]:
+# In[ ]:
 
 
 current_scores_dict = prev_scores_dicts + [scores]
 
 
-# In[105]:
+# In[ ]:
 
 
 graph_scores = pd.DataFrame(current_scores_dict)
 graph_scores
 
 
-# In[106]:
+# In[ ]:
 
 
 graph_scores_t = graph_scores.T
@@ -236,7 +237,7 @@ graph_scores_t.to_csv(results_file, header=False)
 graph_scores_t
 
 
-# In[107]:
+# In[ ]:
 
 
 import matplotlib.pyplot as plt
@@ -292,7 +293,7 @@ legend = plt.legend(sorted_handles, sorted_labels, bbox_to_anchor=(1.02, 1), loc
 plt.savefig(leaderboard_graph_file, bbox_inches="tight")
 
 
-# In[108]:
+# In[ ]:
 
 
 scores_sorted = {k: v for k, v in sorted(scores.items(), key=lambda item: item[1], reverse=True)}
