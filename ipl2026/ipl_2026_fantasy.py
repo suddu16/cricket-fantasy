@@ -16,7 +16,7 @@ pd.set_option('display.max_rows',None) #display all rows
 groups_pts_src_map = {'group_1': 'cricketxi', 'group_2': 'iplt20'}
 groups_team_wins_pts_map = {'group_1': 100, 'group_2': 50}
 groups_team_nr_pts_map = {'group_1': 50, 'group_2': 25}
-playoffs_wins_map = {'Royal Challengers Bengaluru': 1, 'Gujarat Titans': 1, 'Rajasthan Royals': 1}
+playoffs_wins_map = {'Royal Challengers Bengaluru': 2, 'Gujarat Titans': 1, 'Rajasthan Royals': 1}
 # Required Input files
 # When running for the very first time, `ipl2025_results.csv`` file is required with all the team managers and an initial row of 0s.
 # IPL2025MockAuctionSummary.csv file is required with each of the managers, their teams and their players listed.
