@@ -17,6 +17,7 @@ groups_pts_src_map = {'group_1': 'cricketxi', 'group_2': 'iplt20'}
 groups_team_wins_pts_map = {'group_1': 100, 'group_2': 50}
 groups_team_nr_pts_map = {'group_1': 50, 'group_2': 25}
 playoffs_wins_map = {'Royal Challengers Bengaluru': 2, 'Gujarat Titans': 1, 'Rajasthan Royals': 1}
+bonus_pts_map = {'priyanka.suresh': 125, 'ColdTaker': 50}
 # Required Input files
 # When running for the very first time, `ipl2025_results.csv`` file is required with all the team managers and an initial row of 0s.
 # IPL2025MockAuctionSummary.csv file is required with each of the managers, their teams and their players listed.
@@ -205,6 +206,12 @@ scores
 
 # In[ ]:
 
+
+# Apply one-time bonus points
+for mgr, bonus in bonus_pts_map.items():
+    if mgr in scores:
+        scores[mgr] += bonus
+        print(f'Bonus: {mgr} +{bonus} pts')
 
 prev_scores = pd.read_csv(prev_results_file, header=None)
 prev_scores = prev_scores.T
