@@ -1,8 +1,6 @@
 name: IPL Fantasy points calculator
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "53 20 * * *"
 permissions: write-all
 jobs:
   scrape:
